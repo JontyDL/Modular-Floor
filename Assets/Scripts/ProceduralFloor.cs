@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -8,36 +9,35 @@ using UnityEngine;
 public class ProceduralFloor : MonoBehaviour
 {
     [Header("Grid")]
-    public int size = 20;
-    public float spacing = 2f;
+    [SerializeField] private int size = 20;
+    [SerializeField] private float spacing = 2f;
 
     [Header("Terrain")]
-    public float maxStep = 0.5f;
-    public float minHeight = -5f;
-    public float maxHeight = 5f;
+    [SerializeField] private float maxStep = 0.5f;
+    [SerializeField] private float minHeight = -5f;
+    [SerializeField] private float maxHeight = 5f;
 
     [Header("Vegetation")]
-    public GameObject[] treePrefabs;
-    public GameObject[] vegetationPrefabs;
+    [SerializeField] private GameObject[] treePrefabs;
+    [SerializeField] private GameObject[] vegetationPrefabs;
 
     [Range(0f, 1f)]
-    public float treeChance = 0.05f;
+    [SerializeField] private float treeChance = 0.05f;
 
     [Range(0f, 1f)]
-    public float vegetationChance = 0.15f;
+    [SerializeField] private float vegetationChance = 0.15f;
 
-    public float minTreeSpacing = 6f;
+    [SerializeField] private float minTreeSpacing = 6f;
 
     [Header("Vegetation Distribution")]
-    public float forestNoiseScale = 0.05f;
-    public float forestThreshold = 0.55f;
-    public float maxSlope = 30f;
-    public int edgeBuffer = 2;
-    public float placementJitter = 0.35f;
+    [SerializeField] private float forestNoiseScale = 0.05f;
+    [SerializeField] private float forestThreshold = 0.55f;
+    [SerializeField] private float maxSlope = 30f;
+    [SerializeField] private int edgeBuffer = 2;
+    [SerializeField] private float placementJitter = 0.35f;
 
     [Header("Vegetation Exclusion Zone")]
-    [Tooltip("Width, in grid cells, of the cross-shaped no-spawn band running through the center row and center column (e.g. 4 excludes cells 18-21 on a 40x40 grid).")]
-    public float crossExclusionWidth = 4f;
+    [SerializeField] private float crossExclusionWidth = 4f;            // in grid cell units, the width of the area in the center that plans cannot spawn in, so as that they are not on the path 
 
     [Header("Seed")]
     public int seed;
@@ -54,22 +54,14 @@ public class ProceduralFloor : MonoBehaviour
 
     private float[,] heights;
 
-    /*void Start()
-    {
-        terrainRng = new System.Random(seed);
-        vegetationRng = new System.Random(seed ^ 0x5A5A5A5A);
- 
-        Generate();
-        BuildMesh();
-        ClearVegetation();
-        GenerateVegetation();
- 
-        if (showDebugPoints)
-            SpawnDebugPoints();
-    }*/
+    [Header("Nav Mesh Surface")]
+    [SerializeField] private NavMeshSurface NMS;
 
-    private void Awake()
+    private void Awake()        // doing it in awake, because the camera, and central tower will need to know where the center of the map is (awake is called before start)
     {
+        System.Random r = new System.Random();
+        seed = r.Next();
+
         terrainRng = new System.Random(seed);
         vegetationRng = new System.Random(seed ^ 0x5A5A5A5A);
 
@@ -82,10 +74,15 @@ public class ProceduralFloor : MonoBehaviour
             SpawnDebugPoints();
 
         UpdateCenterTarget();
+
+        NMS.BuildNavMesh();             // baking the nav mesh for the agents
     }
 
     private void OnValidate()
     {
+        System.Random r = new System.Random();
+        seed = r.Next();
+
         terrainRng = new System.Random(seed);
         vegetationRng = new System.Random(seed ^ 0x5A5A5A5A);
 
