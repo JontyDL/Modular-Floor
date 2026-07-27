@@ -8,8 +8,7 @@ using UnityEngine;
 public class ProceduralFloor : MonoBehaviour
 {
     [Header("Grid")]
-    public int width = 20;
-    public int height = 20;
+    public int size = 20;
     public float spacing = 2f;
 
     [Header("Terrain")]
@@ -36,6 +35,10 @@ public class ProceduralFloor : MonoBehaviour
     public int edgeBuffer = 2;
     public float placementJitter = 0.35f;
 
+    [Header("Vegetation Exclusion Zone")]
+    [Tooltip("Width, in grid cells, of the cross-shaped no-spawn band running through the center row and center column (e.g. 4 excludes cells 18-21 on a 40x40 grid).")]
+    public float crossExclusionWidth = 4f;
+
     [Header("Seed")]
     public int seed;
     private System.Random terrainRng;
@@ -55,12 +58,12 @@ public class ProceduralFloor : MonoBehaviour
     {
         terrainRng = new System.Random(seed);
         vegetationRng = new System.Random(seed ^ 0x5A5A5A5A);
-
+ 
         Generate();
         BuildMesh();
         ClearVegetation();
         GenerateVegetation();
-
+ 
         if (showDebugPoints)
             SpawnDebugPoints();
     }*/
@@ -102,14 +105,26 @@ public class ProceduralFloor : MonoBehaviour
 
         foreach (Transform child in children)
         {
-            #if UNITY_EDITOR
-                        
-                    DestroyImmediate(child.gameObject);
-            #else
+#if UNITY_EDITOR
+
+            DestroyImmediate(child.gameObject);
+#else
                     Destroy(child.gameObject);
-            #endif
+#endif
 
         }
+    }
+
+    bool IsInCenterCross(int x, int z)
+    {
+        if (crossExclusionWidth <= 0f)
+            return false;
+
+        float centerIndex = (size - 1) / 2f;
+        float half = crossExclusionWidth / 2f;
+
+        return Mathf.Abs(x - centerIndex) < half ||
+               Mathf.Abs(z - centerIndex) < half;
     }
 
     void GenerateVegetation()
@@ -126,10 +141,14 @@ public class ProceduralFloor : MonoBehaviour
         float noiseOffsetX = vegetationRng.Next(-100000, 100000);
         float noiseOffsetZ = vegetationRng.Next(-100000, 100000);
 
-        for (int x = edgeBuffer; x < width - edgeBuffer; x++)
+        for (int x = edgeBuffer; x < size - edgeBuffer; x++)
         {
-            for (int z = edgeBuffer; z < height - edgeBuffer; z++)
+            for (int z = edgeBuffer; z < size - edgeBuffer; z++)
             {
+                // Keep the center cross clear of vegetation
+                if (IsInCenterCross(x, z))
+                    continue;
+
                 Vector3 position = new Vector3(
                     x * spacing,
                     heights[x, z],
@@ -241,12 +260,12 @@ public class ProceduralFloor : MonoBehaviour
 
     void Generate()
     {
-        heights = new float[width, height];
+        heights = new float[size, size];
         heights[0, 0] = 0f;
 
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < size; z++)
             {
                 if (x == 0 && z == 0)
                     continue;
@@ -293,9 +312,9 @@ public class ProceduralFloor : MonoBehaviour
         List<Vector2> uvs = new List<Vector2>();
 
         // Vertices & UVs
-        for (int z = 0; z < height; z++)
+        for (int z = 0; z < size; z++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < size; x++)
             {
                 vertices.Add(new Vector3(
                     x * spacing,
@@ -303,19 +322,19 @@ public class ProceduralFloor : MonoBehaviour
                     z * spacing));
 
                 uvs.Add(new Vector2(
-                    (float)x / (width - 1),
-                    (float)z / (height - 1)));
+                    (float)x / (size - 1),
+                    (float)z / (size - 1)));
             }
         }
 
         // Triangles
-        for (int z = 0; z < height - 1; z++)
+        for (int z = 0; z < size - 1; z++)
         {
-            for (int x = 0; x < width - 1; x++)
+            for (int x = 0; x < size - 1; x++)
             {
-                int a = z * width + x;
+                int a = z * size + x;
                 int b = a + 1;
-                int c = a + width;
+                int c = a + size;
                 int d = c + 1;
 
                 triangles.Add(a);
@@ -348,9 +367,9 @@ public class ProceduralFloor : MonoBehaviour
 
     void SpawnDebugPoints()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < size; z++)
             {
                 GameObject point = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
@@ -370,11 +389,11 @@ public class ProceduralFloor : MonoBehaviour
 
     void UpdateCenterTarget()
     {
-        if (heights == null || width < 1 || height < 1)
+        if (heights == null || size < 1)
             return;
 
-        int cx = (width - 1) / 2;
-        int cz = (height - 1) / 2;
+        int cx = (size - 1) / 2;
+        int cz = (size - 1) / 2;
 
         Vector3 localCenter = new Vector3(
             cx * spacing,
@@ -402,10 +421,10 @@ public class ProceduralFloor : MonoBehaviour
     Vector3 CalculateNormal(int x, int z)
     {
         int x0 = Mathf.Max(0, x - 1);
-        int x1 = Mathf.Min(width - 1, x + 1);
+        int x1 = Mathf.Min(size - 1, x + 1);
 
         int z0 = Mathf.Max(0, z - 1);
-        int z1 = Mathf.Min(height - 1, z + 1);
+        int z1 = Mathf.Min(size - 1, z + 1);
 
         Vector3 dx = new Vector3(
             (x1 - x0) * spacing,
