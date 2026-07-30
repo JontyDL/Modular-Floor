@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3133429536945888204}
   - component: {fileID: 3882252657177694741}
   - component: {fileID: 6056440205095835819}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LPW_Rock_Wall_A1_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

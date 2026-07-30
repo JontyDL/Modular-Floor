@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4241147409562009322}
   - component: {fileID: 6619079957917581562}
   - component: {fileID: 7919156357725474760}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LPW_Tree_C1_9m_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -8,6 +8,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class ProceduralFloor : MonoBehaviour
 {
+    public static ProceduralFloor Instance { get; private set; }
+
     [Header("Grid")]
     [SerializeField] private int size = 20;
     [SerializeField] private float spacing = 2f;
@@ -59,6 +61,8 @@ public class ProceduralFloor : MonoBehaviour
 
     private void Awake()        // doing it in awake, because the camera, and central tower will need to know where the center of the map is (awake is called before start)
     {
+        Instance = this;
+
         System.Random r = new System.Random();
         seed = r.Next();
 
@@ -78,16 +82,9 @@ public class ProceduralFloor : MonoBehaviour
         NMS.BuildNavMesh();             // baking the nav mesh for the agents
     }
 
-    private void OnValidate()
+    private void Start()
     {
-        System.Random r = new System.Random();
-        seed = r.Next();
-
-        terrainRng = new System.Random(seed);
-        vegetationRng = new System.Random(seed ^ 0x5A5A5A5A);
-
-        Generate();
-        BuildMesh();
+        BuildingGridSystem.Instance.GridSize = spacing;
     }
 
     void ClearVegetation()
@@ -413,6 +410,37 @@ public class ProceduralFloor : MonoBehaviour
             OrbitCamera.Instance.target = centerTarget;
             Debug.Log("trying to set center target at: " + centerTarget.position);
         }
+    }
+
+    public float SampleHeight(Vector3 worldPosition)                // sampling the height of the floor at a given world position to prevent jitters from raycasts
+    {
+        if (heights == null || size < 2)
+            return worldPosition.y;
+
+        Vector3 local = transform.InverseTransformPoint(worldPosition);
+
+        float gx = local.x / spacing;
+        float gz = local.z / spacing;
+
+        int x0 = Mathf.Clamp(Mathf.FloorToInt(gx), 0, size - 1);
+        int z0 = Mathf.Clamp(Mathf.FloorToInt(gz), 0, size - 1);
+        int x1 = Mathf.Clamp(x0 + 1, 0, size - 1);
+        int z1 = Mathf.Clamp(z0 + 1, 0, size - 1);
+
+        float tx = Mathf.Clamp01(gx - x0);
+        float tz = Mathf.Clamp01(gz - z0);
+
+        float h00 = heights[x0, z0];
+        float h10 = heights[x1, z0];
+        float h01 = heights[x0, z1];
+        float h11 = heights[x1, z1];
+
+        float hx0 = Mathf.Lerp(h00, h10, tx);
+        float hx1 = Mathf.Lerp(h01, h11, tx);
+        float localHeight = Mathf.Lerp(hx0, hx1, tz);
+
+        Vector3 worldPoint = transform.TransformPoint(new Vector3(local.x, localHeight, local.z));
+        return worldPoint.y;
     }
 
     Vector3 CalculateNormal(int x, int z)
