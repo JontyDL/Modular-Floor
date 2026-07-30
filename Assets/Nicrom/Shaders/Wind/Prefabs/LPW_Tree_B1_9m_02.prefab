@@ -127,5 +127,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db94942caf7d6d43b5b8d85be003ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestructableObject
-  destroyEffectPrefab: {fileID: 0}
+  destroyEffectPrefab: {fileID: 6349170587643239544, guid: 1785d0e8c5ca0ca499a0b9d031665899, type: 3}
   destroySound: {fileID: 0}
