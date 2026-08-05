@@ -1,7 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(Attacker))]
 public class PathFollower : MonoBehaviour
 {
     public enum State
@@ -9,7 +13,8 @@ public class PathFollower : MonoBehaviour
         SeekingLine,                // walking towards the closest path
         FollowingLine,              // following the path to the destination
         MovingToDestination,        // finished following the path, walking to the destination
-        Arrived                     // at the destination, can start attacking the tower
+        Arrived,                    // at the destination, can start attacking the tower
+        AttackingBuilding           // diverted off the path to deal with a building in range
     }
 
     [Header("Line Following")]
@@ -24,17 +29,36 @@ public class PathFollower : MonoBehaviour
     [Header("Polling")]
     [SerializeField] private float ArrivalCheckInterval = 0.25f;        // how often, in seconds, we should check if we've reached the destination
 
+    [Header("Building Interception")]
+    [SerializeField] private float BuildingArriveDistance = 2f;         // how close to get before stopping at a building
+    [SerializeField] private float BuildingCheckInterval = 0.25f;       // how often, in seconds, to check if the current building target is dead/gone
+
     private NavMeshAgent NMAgent;
     private Pathway CurrentPath;
     public float DistanceAlongPath;                 // creating and exposing this now incase I want to do some cutscene scripting later in the project
     private float NoiseSeed;
     private Coroutine RunRoutine;
-    public State CurrentState {  get; private set; }
+    public State CurrentState { get; private set; }
+
+    private Health CombatHealth;
+    private Attacker CombatAttacker;
+
+    private readonly List<Transform> NearbyBuildings = new List<Transform>();           // buildings near our trigger
+    private Transform CurrentBuildingTarget;
 
     private void Awake()
     {
         NMAgent = GetComponent<NavMeshAgent>();
+        CombatHealth = GetComponent<Health>();
+        CombatAttacker = GetComponent<Attacker>();
         NoiseSeed = Random.Range(0, 10000f);
+    }
+
+    public void Initialize(EnemyStats Stats)                // call this immediately after initializing the enemy, to provide it's stats (as we scale speed, damage and health as waves progress)
+    {
+        NMAgent.speed = Stats.MoveSpeed;
+        CombatHealth.SetMaxHealth(Stats.MaxHealth);
+        CombatAttacker.SetStats(Stats.AttackDamage, Stats.AttackRate);
     }
 
     private void OnEnable()
@@ -50,7 +74,7 @@ public class PathFollower : MonoBehaviour
     {
         if (RunRoutine != null) StopCoroutine(RunRoutine);
     }
-    
+
     public void Restart()
     {
         if (RunRoutine != null)
@@ -97,6 +121,15 @@ public class PathFollower : MonoBehaviour
 
         CurrentState = State.Arrived;
         Debug.Log("At the tower!");
+
+        if (dest != null)
+        {
+            Health DestinationHealth = dest.GetComponent<Health>();
+            if (DestinationHealth != null)
+            {
+                CombatAttacker.SetTarget(DestinationHealth);
+            }
+        }
     }
 
     private IEnumerator WaitUntilArrived()
@@ -108,6 +141,94 @@ public class PathFollower : MonoBehaviour
         while (NMAgent.remainingDistance > Mathf.Max(NMAgent.stoppingDistance, DestinationThreshold))
         {
             yield return wait;
+        }
+    }
+
+    private void OnTriggerEnter(Collider Other)
+    {
+        Transform Building = ResolveRoot(Other);
+        if (!Building.CompareTag("Building")) return;
+
+        if (NearbyBuildings.Contains(Building)) return;
+        NearbyBuildings.Add(Building);
+
+        // If we're already dealing with a building, just queue this one - don't
+        // retarget mid-attack. It'll get picked up once the current one is resolved.
+        if (CurrentState != State.AttackingBuilding)
+        {
+            InterruptForBuilding(Building);
+        }
+    }
+
+    private void OnTriggerExit(Collider Other)
+    {
+        Transform Building = ResolveRoot(Other);
+        if (!Building.CompareTag("Building")) return;
+        NearbyBuildings.Remove(Building);
+    }
+
+    private static Transform ResolveRoot(Collider Other)        // in case the collider lives not on the game object, but on a child object
+    {
+        return Other.attachedRigidbody != null ? Other.attachedRigidbody.transform : Other.transform;
+    }
+
+    private void InterruptForBuilding(Transform Building)
+    {
+        if (RunRoutine != null) StopCoroutine(RunRoutine);
+        RunRoutine = StartCoroutine(AttackBuilding(Building));
+    }
+
+    private IEnumerator AttackBuilding(Transform Building)
+    {
+        CurrentState = State.AttackingBuilding;
+        CurrentBuildingTarget = Building;
+        Debug.Log($"Diverting to attack {Building.name}");
+
+        float OriginalStoppingDistance = NMAgent.stoppingDistance;
+        NMAgent.stoppingDistance = BuildingArriveDistance;
+        NMAgent.SetDestination(Building.position);
+
+        while (NMAgent.pathPending)
+            yield return null;
+
+        WaitForSeconds Wait = BuildingCheckInterval > 0f ? new WaitForSeconds(BuildingCheckInterval) : null;
+
+        // Close the distance before actually swinging at it.
+        while (CurrentBuildingTarget != null && NearbyBuildings.Contains(CurrentBuildingTarget)
+               && NMAgent.remainingDistance > NMAgent.stoppingDistance)
+        {
+            yield return Wait;
+        }
+
+        // Still valid and in range - start dealing damage, then hold here until it dies or leaves.
+        if (CurrentBuildingTarget != null && NearbyBuildings.Contains(CurrentBuildingTarget))
+        {
+            Health BuildingHealth = Building.GetComponent<Health>();
+            if (BuildingHealth != null)
+                CombatAttacker.SetTarget(BuildingHealth);
+
+            while (CurrentBuildingTarget != null && NearbyBuildings.Contains(CurrentBuildingTarget))
+            {
+                yield return Wait;
+            }
+        }
+
+        CombatAttacker.StopAttacking();
+        NMAgent.stoppingDistance = OriginalStoppingDistance;
+
+        bool WasDestroyed = CurrentBuildingTarget == null;
+        NearbyBuildings.RemoveAll(T => T == null); // clean up any other stale references
+        CurrentBuildingTarget = null;
+
+        if (NearbyBuildings.Count > 0)
+        {
+            // Something else was overlapping while we were busy - deal with it next.
+            Transform Next = NearbyBuildings[0];
+            RunRoutine = StartCoroutine(AttackBuilding(Next));
+        }
+        else
+        {
+            RunRoutine = StartCoroutine(Run());     // Nothing left to fight - resume normal behaviour.
         }
     }
 

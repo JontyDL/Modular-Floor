@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.EventSystems;
 
 public class BuildingGridSystem : MonoBehaviour
 {
@@ -9,11 +8,11 @@ public class BuildingGridSystem : MonoBehaviour
     public GameObject PlacingObject;
     public float GridSize;
 
-    [Tooltip("Layers that count as obstacles (bushes, plants, etc). The preview will be blocked from placing if it overlaps anything on these layers.")]
     [SerializeField] private LayerMask NatureLayerMask;     // the layer that the tree's and rocks are on
 
+    [SerializeField] private LayerMask GroundLayerMask;
+
     [Header("Ghost Preview")]
-    [Tooltip("Shader used for the placement ghost. Pick something simple whose properties you control, e.g. 'Universal Render Pipeline/Unlit'. If left empty, URP Unlit is used automatically.")]
     [SerializeField] private Shader ghostShader;
 
     private GameObject PreviewObject;
@@ -38,10 +37,27 @@ public class BuildingGridSystem : MonoBehaviour
         }
     }
 
-    public void Activate()
+    public void Toggle()
     {
-        CreateGhostObject();
-        isActive = true;
+        if (isActive == false)      // we are turning it on
+        {
+            CreateGhostObject();
+            isActive = true;
+        }
+        else
+        {                           // we are turning it off
+            Destroy(PreviewObject);
+            PreviewObject = null;
+            PreviewCollider = null;
+
+            if (ghostMaterialInstance != null)
+            {
+                Destroy(ghostMaterialInstance);
+                ghostMaterialInstance = null;
+            }
+
+            isActive = false;
+        }
     }
 
     public void Deactivate()
@@ -86,22 +102,14 @@ public class BuildingGridSystem : MonoBehaviour
             Debug.LogWarning($"BuildingGridSystem: {PlacingObject.name} has no Collider, overlap checks will be skipped.");
         }
 
-        // Rather than trying to figure out every building's shader property names (which is
-        // what kept breaking with Toon_URP etc), every renderer on the preview gets swapped
-        // onto one ghost material whose shader WE chose, so we always know it exposes
-        // "_BaseColor". The building's real materials are untouched — this only ever runs on
-        // the throwaway preview instance, never on the object actually placed in PlaceObject().
         Shader shader = ghostShader != null ? ghostShader : Shader.Find("Universal Render Pipeline/Unlit");
         ghostMaterialInstance = new Material(shader);
-        ConfigureGhostTransparency(ghostMaterialInstance);
         ghostMaterialInstance.SetColor("_BaseColor", ValidColor);
 
         Renderer[] renderers = PreviewObject.GetComponentsInChildren<Renderer>();
 
         foreach (Renderer renderer in renderers)
         {
-            // Every material slot becomes the same ghost material instance, so one SetColor
-            // call later (in SetGhostColour) updates every mesh on the preview at once.
             Material[] ghostMats = new Material[renderer.sharedMaterials.Length];
             for (int i = 0; i < ghostMats.Length; i++)
             {
@@ -111,40 +119,15 @@ public class BuildingGridSystem : MonoBehaviour
         }
     }
 
-    static void ConfigureGhostTransparency(Material mat)
-    {
-        // URP Lit/Unlit convention: _Surface 1 = Transparent, _Blend 0 = alpha blend.
-        // Guarded with HasProperty in case someone points ghostShader at something unusual.
-        if (mat.HasProperty("_Surface")) mat.SetFloat("_Surface", 1f);
-        if (mat.HasProperty("_Blend")) mat.SetFloat("_Blend", 0f);
-        if (mat.HasProperty("_SrcBlend")) mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        if (mat.HasProperty("_DstBlend")) mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-        if (mat.HasProperty("_ZWrite")) mat.SetInt("_ZWrite", 0);
-
-        mat.DisableKeyword("_ALPHATEST_ON");
-        mat.EnableKeyword("_ALPHABLEND_ON");
-        mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-        mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-
-        mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-    }
-
     void UpdateGhostPosition()
     {
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-        if (Physics.Raycast(ray, out RaycastHit hitInfo))
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, GroundLayerMask, QueryTriggerInteraction.Ignore))
         {
             Vector3 point = hitInfo.point;
 
-            // Snap X/Z to the grid. Y is deliberately NOT derived from rounding the raw
-            // raycast hit anymore — on sloped/uneven terrain that caused the preview to
-            // shake, because a tiny sub-pixel mouse move could shift the raycast hit height
-            // just enough to flip the rounded value to the next GridSize step and back,
-            // every frame. Instead we snap X/Z first, then ask the terrain for the exact
-            // height at that grid cell — which only changes when the snapped cell changes,
-            // not on every mouse jitter.
-            Vector3 snappedPosition = new Vector3(
+            Vector3 snappedPosition = new Vector3(                      // snap X and Z, derive Y from the terrain
                 Mathf.Round(point.x / GridSize) * GridSize,
                 point.y,
                 Mathf.Round(point.z / GridSize) * GridSize
@@ -203,9 +186,6 @@ public class BuildingGridSystem : MonoBehaviour
         {
             return; // its blocked by something, cancel the input
         }
-
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())                   // so it doesn't fire when clicking on a ui button
-            return;
 
         Vector3 placementPos = PreviewObject.transform.position;
         GameObject placed = Instantiate(PlacingObject, placementPos, PreviewObject.transform.rotation);
