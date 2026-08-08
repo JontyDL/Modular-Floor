@@ -1,11 +1,16 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 [DisallowMultipleComponent]
 public class Attacker : MonoBehaviour
 {
     [SerializeField] private float AttackDamage = 10f;
     [SerializeField] private float AttackRate = 1f;   // attacks per second
+
+    [Header("Knockback")]
+    [Tooltip("Only applied to targets tagged \"Enemy\" - e.g. buildings hitting AI, not the other way round.")]
+    [SerializeField] private float KnockbackForce = 2f;
 
     private Health TargetHealth;
     private Coroutine AttackRoutine;
@@ -45,11 +50,33 @@ public class Attacker : MonoBehaviour
         while (TargetHealth != null)
         {
             TargetHealth.TakeDamage(AttackDamage);
+
+            if (!TargetHealth.IsDead)                       // if it's going to di this frame anyway, no need to calculate knockback
+            {
+                ApplyKnockbackIfEnemy(TargetHealth);
+            }
+
             yield return Wait;
         }
 
         // TargetHealth went fake-null, meaning the target GameObject was destroyed.
         AttackRoutine = null;
         OnTargetLost?.Invoke();
+    }
+
+    private void ApplyKnockbackIfEnemy(Health Target)           // obviously the enemy cant knockback the building
+    {
+        if (Target == null || KnockbackForce <= 0f) return;
+        if (!Target.CompareTag("Enemy")) return;
+
+        NavMeshAgent TargetAgent = Target.GetComponent<NavMeshAgent>();
+        if (TargetAgent == null) return;
+
+        Vector3 Direction = Target.transform.position - transform.position;
+        Direction.y = 0f;
+        if (Direction.sqrMagnitude < 0.0001f) Direction = Target.transform.forward;
+        Direction.Normalize();
+
+        TargetAgent.Move(Direction * KnockbackForce);           // displaces the agent, but keeps it on the navmesh
     }
 }

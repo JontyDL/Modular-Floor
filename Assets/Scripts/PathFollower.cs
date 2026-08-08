@@ -43,7 +43,9 @@ public class PathFollower : MonoBehaviour
     private Health CombatHealth;
     private Attacker CombatAttacker;
 
-    private readonly List<Transform> NearbyBuildings = new List<Transform>();           // buildings near our trigger
+    // Buildings currently overlapping our trigger, in the order they were entered.
+    // The first one is always the current target while AttackingBuilding.
+    private readonly List<Transform> NearbyBuildings = new List<Transform>();
     private Transform CurrentBuildingTarget;
 
     private void Awake()
@@ -52,9 +54,11 @@ public class PathFollower : MonoBehaviour
         CombatHealth = GetComponent<Health>();
         CombatAttacker = GetComponent<Attacker>();
         NoiseSeed = Random.Range(0, 10000f);
+
+        CombatHealth.OnDeath += HandleDeath;
     }
 
-    public void Initialize(EnemyStats Stats)                // call this immediately after initializing the enemy, to provide it's stats (as we scale speed, damage and health as waves progress)
+    public void Initialize(EnemyStats Stats)            // call this after instantiating the object, to give it the relevant stats
     {
         NMAgent.speed = Stats.MoveSpeed;
         CombatHealth.SetMaxHealth(Stats.MaxHealth);
@@ -73,6 +77,12 @@ public class PathFollower : MonoBehaviour
     private void OnDestroy()
     {
         if (RunRoutine != null) StopCoroutine(RunRoutine);
+        CombatHealth.OnDeath -= HandleDeath;
+    }
+
+    private void HandleDeath()
+    {
+        StopAllCoroutines();
     }
 
     public void Restart()
@@ -152,9 +162,7 @@ public class PathFollower : MonoBehaviour
         if (NearbyBuildings.Contains(Building)) return;
         NearbyBuildings.Add(Building);
 
-        // If we're already dealing with a building, just queue this one - don't
-        // retarget mid-attack. It'll get picked up once the current one is resolved.
-        if (CurrentState != State.AttackingBuilding)
+        if (CurrentState != State.AttackingBuilding)            // if we aren't already attacking something, start attacking, if we are, add it to the list of following objectives
         {
             InterruptForBuilding(Building);
         }
@@ -167,7 +175,7 @@ public class PathFollower : MonoBehaviour
         NearbyBuildings.Remove(Building);
     }
 
-    private static Transform ResolveRoot(Collider Other)        // in case the collider lives not on the game object, but on a child object
+    private static Transform ResolveRoot(Collider Other)        // if the trigger collider is ona  child object
     {
         return Other.attachedRigidbody != null ? Other.attachedRigidbody.transform : Other.transform;
     }
@@ -180,6 +188,8 @@ public class PathFollower : MonoBehaviour
 
     private IEnumerator AttackBuilding(Transform Building)
     {
+        if (!NMAgent.isOnNavMesh) yield return 0.1f;
+
         CurrentState = State.AttackingBuilding;
         CurrentBuildingTarget = Building;
         Debug.Log($"Diverting to attack {Building.name}");
@@ -194,8 +204,7 @@ public class PathFollower : MonoBehaviour
         WaitForSeconds Wait = BuildingCheckInterval > 0f ? new WaitForSeconds(BuildingCheckInterval) : null;
 
         // Close the distance before actually swinging at it.
-        while (CurrentBuildingTarget != null && NearbyBuildings.Contains(CurrentBuildingTarget)
-               && NMAgent.remainingDistance > NMAgent.stoppingDistance)
+        while (CurrentBuildingTarget != null && NearbyBuildings.Contains(CurrentBuildingTarget) && NMAgent.remainingDistance > NMAgent.stoppingDistance)
         {
             yield return Wait;
         }
@@ -219,16 +228,16 @@ public class PathFollower : MonoBehaviour
         bool WasDestroyed = CurrentBuildingTarget == null;
         NearbyBuildings.RemoveAll(T => T == null); // clean up any other stale references
         CurrentBuildingTarget = null;
+        Debug.Log(WasDestroyed ? $"{Building.name} destroyed" : $"{Building.name} left range");
 
-        if (NearbyBuildings.Count > 0)
+        if (NearbyBuildings.Count > 0)                              // Something else was overlapping while we were busy - deal with it next.
         {
-            // Something else was overlapping while we were busy - deal with it next.
             Transform Next = NearbyBuildings[0];
             RunRoutine = StartCoroutine(AttackBuilding(Next));
         }
         else
         {
-            RunRoutine = StartCoroutine(Run());     // Nothing left to fight - resume normal behaviour.
+            RunRoutine = StartCoroutine(Run());             // Nothing left to fight - resume normal behaviour.
         }
     }
 
