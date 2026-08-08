@@ -180,7 +180,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Attacker
   AttackDamage: 10
-  AttackRate: 10
+  AttackRate: 1
   KnockbackForce: 1.2
 --- !u!114 &-6921190020824930214
 MonoBehaviour:

@@ -14,6 +14,7 @@ public class Attacker : MonoBehaviour
 
     private Health TargetHealth;
     private Coroutine AttackRoutine;
+    private float NextAttackTime;   // absolute Time.time; persists across SetTarget calls so knocking an enemy out and back in of range doesn't bypass the cooldown
 
     public bool HasTarget => TargetHealth != null;
     public Transform CurrentTargetTransform => TargetHealth != null ? TargetHealth.transform : null;
@@ -44,19 +45,23 @@ public class Attacker : MonoBehaviour
 
     private IEnumerator AttackLoop()
     {
-        float Interval = AttackRate > 0f ? 1f / AttackRate : 1f;
-        WaitForSeconds Wait = new WaitForSeconds(Interval);
-
         while (TargetHealth != null)
         {
+            float WaitTime = NextAttackTime - Time.time;
+            if (WaitTime > 0f)
+                yield return new WaitForSeconds(WaitTime);
+
+            // Target may have been lost, killed, or swapped out while we were waiting.
+            if (TargetHealth == null) break;
+
             TargetHealth.TakeDamage(AttackDamage);
+            float Interval = AttackRate > 0f ? 1f / AttackRate : 1f;
+            NextAttackTime = Time.time + Interval;
 
             if (!TargetHealth.IsDead)                       // if it's going to di this frame anyway, no need to calculate knockback
             {
                 ApplyKnockbackIfEnemy(TargetHealth);
             }
-
-            yield return Wait;
         }
 
         // TargetHealth went fake-null, meaning the target GameObject was destroyed.
