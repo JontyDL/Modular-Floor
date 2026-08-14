@@ -19,7 +19,6 @@ public class Health : MonoBehaviour
     public float CurrentHealth { get; private set; }
     public bool IsDead => CurrentHealth <= 0f;
 
-    public event Action<float> OnDamaged;   // amount dealt
     public event Action OnDeath;
 
     private Renderer[] CachedRenderers;         // saving all the renderers and materials from an object so that we can flash when we take damage
@@ -30,17 +29,25 @@ public class Health : MonoBehaviour
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor"); // URP/HDRP Lit
     private static readonly int ColorId = Shader.PropertyToID("_Color");         // Built-in Standard/Legacy
 
+    private HealthBar HB;
     private void Awake()
     {
         MaxHealth = StartingMaxHealth;
         CurrentHealth = MaxHealth;
         CacheRenderers();
+
+        HB = GetComponentInChildren<HealthBar>();
     }
 
     public void SetMaxHealth(float NewMax, bool RefillToFull = true)        // use this to refill building health/upgrade it
     {
         MaxHealth = Mathf.Max(1f, NewMax);
-        CurrentHealth = RefillToFull ? MaxHealth : Mathf.Min(CurrentHealth, MaxHealth);
+
+        if (RefillToFull)
+        {
+            CurrentHealth = MaxHealth;
+            if (HB != null) HB.UpdateHealthBar(MaxHealth, CurrentHealth);
+        }
     }
 
     public void TakeDamage(float Amount)
@@ -48,7 +55,6 @@ public class Health : MonoBehaviour
         if (IsDead || Amount <= 0f) return;
 
         CurrentHealth = Mathf.Max(0f, CurrentHealth - Amount);
-        OnDamaged?.Invoke(Amount);
 
         if (CurrentHealth <= 0f)
         {
@@ -59,6 +65,7 @@ public class Health : MonoBehaviour
         else
         {
             DamageColours();
+            if (HB != null) HB.UpdateHealthBar(MaxHealth, CurrentHealth);
         }
     }
 

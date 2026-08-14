@@ -24,7 +24,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &262782994882738729
 Transform:
   m_ObjectHideFlags: 0
@@ -143,7 +143,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
@@ -186,7 +186,7 @@ MonoBehaviour:
   WanderSpeed: 0.2
   DestinationThreshold: 15
   ArrivalCheckInterval: 0.25
-  BuildingArriveDistance: 2
+  BuildingArriveDistance: 15
   BuildingCheckInterval: 0.25
   DistanceAlongPath: 0
 --- !u!135 &8720448085654876692
@@ -222,7 +222,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa6c9805be733fb4a8185095357b4465, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  StartingMaxHealth: 10
+  StartingMaxHealth: 25
+  FlashColour: {r: 1, g: 0, b: 0, a: 1}
+  FlashDuration: 0.15
 --- !u!114 &7423423097130839355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,3 +239,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Attacker
   AttackDamage: 5
   AttackRate: 1
+  KnockbackForce: 2
