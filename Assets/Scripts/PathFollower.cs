@@ -37,6 +37,7 @@ public class PathFollower : MonoBehaviour
     private Pathway CurrentPath;
     public float DistanceAlongPath;                 // creating and exposing this now incase I want to do some cutscene scripting later in the project
     private float NoiseSeed;
+    private float DefaultStoppingDistance;
     private Coroutine RunRoutine;
     public State CurrentState { get; private set; }
 
@@ -54,7 +55,7 @@ public class PathFollower : MonoBehaviour
         CombatHealth = GetComponent<Health>();
         CombatAttacker = GetComponent<Attacker>();
         NoiseSeed = Random.Range(0, 10000f);
-
+        DefaultStoppingDistance = NMAgent.stoppingDistance;
         CombatHealth.OnDeath += HandleDeath;
     }
 
@@ -63,6 +64,18 @@ public class PathFollower : MonoBehaviour
         NMAgent.speed = Stats.MoveSpeed;
         CombatHealth.SetMaxHealth(Stats.MaxHealth);
         CombatAttacker.SetStats(Stats.AttackDamage, Stats.AttackRate);
+    }
+
+    public void ResetForPool()      // we call this to prepare an enemy after pulling it out of the pool
+    {
+        StopAllCoroutines();
+
+        NearbyBuildings.Clear();
+        CurrentBuildingTarget = null;
+        CombatAttacker.StopAttacking();
+        CurrentState = State.SeekingLine;
+        CombatHealth.ResetForPool();
+        NMAgent.stoppingDistance = DefaultStoppingDistance;
     }
 
     private void OnEnable()
@@ -100,7 +113,7 @@ public class PathFollower : MonoBehaviour
         if (!PathManager.FindClosestPath(transform.position, out CurrentPath, out Vector3 point, out DistanceAlongPath))
         {
             CurrentState = State.Arrived;        // nothing to follow
-            Debug.Log("Error, no path to follow");
+            Debug.Log("Error, no path to follow, called by: " + gameObject.name);
             yield break;
         }
         NMAgent.SetDestination(point);
@@ -156,6 +169,8 @@ public class PathFollower : MonoBehaviour
 
     private void OnTriggerEnter(Collider Other)
     {
+        if (!isActiveAndEnabled) return;
+
         Transform Building = ResolveRoot(Other);
         if (!Building.CompareTag("Building")) return;
 
@@ -170,6 +185,8 @@ public class PathFollower : MonoBehaviour
 
     private void OnTriggerExit(Collider Other)
     {
+        if (!isActiveAndEnabled) return;
+
         Transform Building = ResolveRoot(Other);
         if (!Building.CompareTag("Building")) return;
         NearbyBuildings.Remove(Building);

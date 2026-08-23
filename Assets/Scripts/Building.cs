@@ -10,7 +10,7 @@ public class Building : MonoBehaviour
     private Attacker BuildingAttacker;
     private bool CanAttack = false;
     public int Cost;
-
+    public bool IsMainTower = false;
     // Enemies currently in range, in the order they entered. First is always the current target.
     private readonly List<Transform> NearbyEnemies = new List<Transform>();
 
@@ -20,6 +20,9 @@ public class Building : MonoBehaviour
         BuildingAttacker = GetComponent<Attacker>();
 
         Collider AttackRange = GetComponent<Collider>();
+
+        if (IsMainTower)
+            CanAttack = true;
     }
 
     private void OnEnable()
@@ -38,6 +41,8 @@ public class Building : MonoBehaviour
         {
             Transform Enemy = ResolveRoot(Other);
             if (!Enemy.CompareTag("Enemy")) return;
+
+            NearbyEnemies.RemoveAll(IsGone);   // drop any stale/dead entries before checking
 
             if (NearbyEnemies.Contains(Enemy)) return;
             NearbyEnemies.Add(Enemy);
@@ -76,7 +81,7 @@ public class Building : MonoBehaviour
 
     private void TargetNext()
     {
-        NearbyEnemies.RemoveAll(T => T == null);
+        NearbyEnemies.RemoveAll(IsGone);
 
         if (NearbyEnemies.Count == 0)
         {
@@ -85,15 +90,17 @@ public class Building : MonoBehaviour
         }
 
         Transform Next = NearbyEnemies[0];
-        Health NextHealth = Next.GetComponent<Health>();
-        if (NextHealth == null)
-        {
-            NearbyEnemies.RemoveAt(0);                  // the enemy is missing a health component for some reason, forget about it
-            TargetNext();
-            return;
-        }
+        BuildingAttacker.SetTarget(Next.GetComponent<Health>());
+    }
 
-        BuildingAttacker.SetTarget(NextHealth);
+    // True if this entry is no longer a valid attack target: destroyed, missing its
+    // Health component, or already dead. Pooled enemies are deactivated rather than
+    // destroyed on death, so the plain null-check alone misses them.
+    private static bool IsGone(Transform Enemy)
+    {
+        if (Enemy == null) return true;
+        Health H = Enemy.GetComponent<Health>();
+        return H == null || H.IsDead;
     }
 
     public void Placed()        // so the buildings don't function when they are just a grid system ghost

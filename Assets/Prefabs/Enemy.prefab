@@ -25,7 +25,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &262782994882738729
 Transform:
   m_ObjectHideFlags: 0
@@ -187,7 +187,7 @@ MonoBehaviour:
   WanderSpeed: 0.2
   DestinationThreshold: 15
   ArrivalCheckInterval: 0.25
-  BuildingArriveDistance: 15
+  BuildingArriveDistance: 7
   BuildingCheckInterval: 0.25
   DistanceAlongPath: 0
 --- !u!135 &8720448085654876692
@@ -209,7 +209,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 7
+  m_Radius: 6
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8275660727665125390
 MonoBehaviour:
@@ -224,6 +224,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   StartingMaxHealth: 25
+  DestroyOnDeath: 0
   FlashColour: {r: 1, g: 0, b: 0, a: 1}
   FlashDuration: 0.15
 --- !u!114 &7423423097130839355
@@ -254,3 +255,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GiveMoneyOnDeath
   GoldAmount: 5
+  IsEnemy: 1

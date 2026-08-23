@@ -31,16 +31,40 @@ public class Attacker : MonoBehaviour
     {
         if (TargetHealth == Target) return;
 
+        if (TargetHealth != null)
+            TargetHealth.OnDeath -= HandleTargetDeath;
+
         if (AttackRoutine != null) StopCoroutine(AttackRoutine);
         TargetHealth = Target;
-        AttackRoutine = TargetHealth != null ? StartCoroutine(AttackLoop()) : null;
+
+        if (TargetHealth != null)
+        {
+            TargetHealth.OnDeath += HandleTargetDeath;
+            AttackRoutine = StartCoroutine(AttackLoop());
+        }
+        else
+        {
+            AttackRoutine = null;
+        }
     }
 
     public void StopAttacking()
     {
+        if (TargetHealth != null)
+            TargetHealth.OnDeath -= HandleTargetDeath;
+
         if (AttackRoutine != null) StopCoroutine(AttackRoutine);
         AttackRoutine = null;
         TargetHealth = null;
+    }
+
+    private void HandleTargetDeath()
+    {
+        // Pooled targets (e.g. enemies) survive as deactivated-but-not-destroyed
+        // objects, so we can't rely on TargetHealth going fake-null anymore -
+        // OnDeath is now the source of truth for "this target is gone".
+        StopAttacking();
+        OnTargetLost?.Invoke();
     }
 
     private IEnumerator AttackLoop()
@@ -51,22 +75,22 @@ public class Attacker : MonoBehaviour
             if (WaitTime > 0f)
                 yield return new WaitForSeconds(WaitTime);
 
-            // Target may have been lost, killed, or swapped out while we were waiting.
-            if (TargetHealth == null) break;
+            Health CurrentTarget = TargetHealth;
+            if (CurrentTarget == null) break;
 
-            TargetHealth.TakeDamage(AttackDamage);
+            CurrentTarget.TakeDamage(AttackDamage);
             float Interval = AttackRate > 0f ? 1f / AttackRate : 1f;
             NextAttackTime = Time.time + Interval;
 
-            if (!TargetHealth.IsDead)                       // if it's going to di this frame anyway, no need to calculate knockback
+            // TakeDamage may have killed the target and, via HandleTargetDeath, already
+            // cleared TargetHealth and stopped this coroutine - guard before touching it again.
+            if (TargetHealth == CurrentTarget && !CurrentTarget.IsDead)
             {
-                ApplyKnockbackIfEnemy(TargetHealth);
+                ApplyKnockbackIfEnemy(CurrentTarget);
             }
         }
 
-        // TargetHealth went fake-null, meaning the target GameObject was destroyed.
         AttackRoutine = null;
-        OnTargetLost?.Invoke();
     }
 
     private void ApplyKnockbackIfEnemy(Health Target)           // obviously the enemy cant knockback the building

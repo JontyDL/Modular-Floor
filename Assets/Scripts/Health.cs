@@ -2,14 +2,12 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Shared health component. Attach to both AI and Buildings. Anything with
-/// this component can be damaged and, on reaching zero, is destroyed. Also
-/// flashes any renderers on this object (and its children) when damaged.
-/// </summary>
 public class Health : MonoBehaviour
 {
     [SerializeField] private float StartingMaxHealth = 100f;
+
+    [Header("Pooling")]
+    [SerializeField] private bool DestroyOnDeath = true;   // uncheck on pooled prefabs (e.g. enemies) - the pool owns their lifecycle instead
 
     [Header("Damage Flash")]
     [SerializeField] private Color FlashColour = Color.red;
@@ -50,6 +48,16 @@ public class Health : MonoBehaviour
         }
     }
 
+    public void ResetForPool()
+    {
+        if (FlashRoutine != null)
+        {
+            StopCoroutine(FlashRoutine);
+            FlashRoutine = null;
+        }
+        RestoreOriginalColours();
+    }
+
     public void TakeDamage(float Amount)
     {
         if (IsDead || Amount <= 0f) return;
@@ -58,8 +66,18 @@ public class Health : MonoBehaviour
 
         if (CurrentHealth <= 0f)
         {
+            // Cut off any in-progress flash so a pooled object doesn't get reused mid-flash.
+            if (FlashRoutine != null)
+            {
+                StopCoroutine(FlashRoutine);
+                FlashRoutine = null;
+            }
+            RestoreOriginalColours();
+
             OnDeath?.Invoke();
-            Destroy(gameObject);
+
+            if (DestroyOnDeath)
+                Destroy(gameObject);
             // play some death sfx here
         }
         else

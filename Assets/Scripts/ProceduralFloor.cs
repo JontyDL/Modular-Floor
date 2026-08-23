@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -410,6 +411,48 @@ public class ProceduralFloor : MonoBehaviour
             OrbitCamera.Instance.target = centerTarget;
             Debug.Log("trying to set center target at: " + centerTarget.position);
         }
+    }
+
+    public bool TryGetRandomEdgeSpawnPosition(out Vector3 WorldPosition, int MaxAttempts = 15)
+    {
+        WorldPosition = transform.position;
+
+        if (heights == null || edgeBuffer <= 0 || size < edgeBuffer * 2)
+            return false;
+
+        for (int attempt = 0; attempt < MaxAttempts; attempt++)
+        {
+            int x, z;
+
+            // Half the time restrict z to the top/bottom buffer rows (x can be anywhere),
+            // the other half restrict x to the left/right buffer columns (z can be anywhere).
+            // Together these two bands form the full ring around the edge.
+            if (UnityEngine.Random.value < 0.5f)
+            {
+                x = UnityEngine.Random.Range(0, size);
+                z = UnityEngine.Random.value < 0.5f
+                    ? UnityEngine.Random.Range(0, edgeBuffer)
+                    : UnityEngine.Random.Range(size - edgeBuffer, size);
+            }
+            else
+            {
+                z = UnityEngine.Random.Range(0, size);
+                x = UnityEngine.Random.value < 0.5f
+                    ? UnityEngine.Random.Range(0, edgeBuffer)
+                    : UnityEngine.Random.Range(size - edgeBuffer, size);
+            }
+
+            Vector3 local = new Vector3(x * spacing, heights[x, z], z * spacing);
+            Vector3 world = transform.TransformPoint(local);
+
+            if (NavMesh.SamplePosition(world, out NavMeshHit hit, spacing, NavMesh.AllAreas))
+            {
+                WorldPosition = hit.position;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public float SampleHeight(Vector3 worldPosition)                // sampling the height of the floor at a given world position to prevent jitters from raycasts
