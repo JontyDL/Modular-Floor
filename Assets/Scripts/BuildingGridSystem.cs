@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class BuildingGridSystem : MonoBehaviour
@@ -7,6 +8,7 @@ public class BuildingGridSystem : MonoBehaviour
 
     public GameObject PlacingObject;
     public float GridSize;
+    private Building PlacingBuilding;
 
     [SerializeField] private LayerMask NatureLayerMask;     // the layer that the tree's and rocks are on
 
@@ -49,6 +51,7 @@ public class BuildingGridSystem : MonoBehaviour
             Destroy(PreviewObject);
             PreviewObject = null;
             PreviewCollider = null;
+            PlacingBuilding = null;
 
             if (ghostMaterialInstance != null)
             {
@@ -65,6 +68,7 @@ public class BuildingGridSystem : MonoBehaviour
         Destroy(PreviewObject);
         PreviewObject = null;
         PreviewCollider = null;
+        PlacingBuilding = null;
 
         if (ghostMaterialInstance != null)
         {
@@ -81,7 +85,7 @@ public class BuildingGridSystem : MonoBehaviour
 
         UpdateGhostPosition();
 
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && !EventSystem.current.IsPointerOverGameObject())
         {
             PlaceObject();
         }
@@ -90,6 +94,7 @@ public class BuildingGridSystem : MonoBehaviour
     void CreateGhostObject()
     {
         PreviewObject = Instantiate(PlacingObject);
+        PlacingBuilding = PlacingObject.GetComponent<Building>();
 
         PreviewCollider = PreviewObject.GetComponentInChildren<Collider>();
 
@@ -145,7 +150,7 @@ public class BuildingGridSystem : MonoBehaviour
 
             PreviewObject.transform.position = snappedPosition;
 
-            isPlacementValid = !IsOverlappingObstacle();
+            isPlacementValid = !IsOverlappingObstacle() && MoneyManager.Instance.HasEnoughGold(PlacingBuilding.Cost);
             SetGhostColour(isPlacementValid ? ValidColor : InvalidColor);
         }
     }
@@ -160,7 +165,7 @@ public class BuildingGridSystem : MonoBehaviour
             bounds.extents,
             PreviewObject.transform.rotation,
             NatureLayerMask,
-            QueryTriggerInteraction.Collide
+            QueryTriggerInteraction.Ignore
         );
 
         foreach (Collider col in overlaps)
@@ -189,5 +194,8 @@ public class BuildingGridSystem : MonoBehaviour
 
         Vector3 placementPos = PreviewObject.transform.position;
         GameObject placed = Instantiate(PlacingObject, placementPos, PreviewObject.transform.rotation);
+        MoneyManager.Instance.TransactGold(-PlacingBuilding.Cost);
+
+        placed.GetComponent<Building>().Placed();
     }
 }

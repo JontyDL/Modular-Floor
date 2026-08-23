@@ -13,6 +13,10 @@ GameObject:
   - component: {fileID: 4465233627286074046}
   - component: {fileID: 759984800252902965}
   - component: {fileID: 8189185785738175563}
+  - component: {fileID: 3712261597231897992}
+  - component: {fileID: 4784751830420510514}
+  - component: {fileID: -2813902834190245225}
+  - component: {fileID: -2138125212275329525}
   m_Layer: 6
   m_Name: Stone_Mine
   m_TagString: Untagged
@@ -128,3 +132,60 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 7.9132586, y: 4.1332855, z: 10.779663}
   m_Center: {x: -0.41635478, y: 0.94135106, z: -0.85639954}
+--- !u!114 &3712261597231897992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911318930800219686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa6c9805be733fb4a8185095357b4465, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  StartingMaxHealth: 100
+  FlashColour: {r: 1, g: 0, b: 0, a: 1}
+  FlashDuration: 0.15
+--- !u!114 &4784751830420510514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911318930800219686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b686a4c0f5145b849a853038c6afcf25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Attacker
+  AttackDamage: 0
+  AttackRate: 0
+  KnockbackForce: 0
+--- !u!114 &-2813902834190245225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911318930800219686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4af13c7c130b7a648ba58713c88366ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Building
+  Cost: 300
+--- !u!114 &-2138125212275329525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911318930800219686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14d0366dbc7d8d1478d8e078dabb7a78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoldMine
+  Delay: 1.75
+  GoldFound: 1

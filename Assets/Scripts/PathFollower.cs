@@ -228,7 +228,6 @@ public class PathFollower : MonoBehaviour
         bool WasDestroyed = CurrentBuildingTarget == null;
         NearbyBuildings.RemoveAll(T => T == null); // clean up any other stale references
         CurrentBuildingTarget = null;
-        Debug.Log(WasDestroyed ? $"{Building.name} destroyed" : $"{Building.name} left range");
 
         if (NearbyBuildings.Count > 0)                              // Something else was overlapping while we were busy - deal with it next.
         {

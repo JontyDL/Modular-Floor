@@ -8,6 +8,8 @@ public class Building : MonoBehaviour
 {
     private Health BuildingHealth;
     private Attacker BuildingAttacker;
+    private bool CanAttack = false;
+    public int Cost;
 
     // Enemies currently in range, in the order they entered. First is always the current target.
     private readonly List<Transform> NearbyEnemies = new List<Transform>();
@@ -32,15 +34,18 @@ public class Building : MonoBehaviour
 
     private void OnTriggerEnter(Collider Other)
     {
-        Transform Enemy = ResolveRoot(Other);
-        if (!Enemy.CompareTag("Enemy")) return;
-
-        if (NearbyEnemies.Contains(Enemy)) return;
-        NearbyEnemies.Add(Enemy);
-
-        if (!BuildingAttacker.HasTarget)
+        if (CanAttack)
         {
-            TargetNext();
+            Transform Enemy = ResolveRoot(Other);
+            if (!Enemy.CompareTag("Enemy")) return;
+
+            if (NearbyEnemies.Contains(Enemy)) return;
+            NearbyEnemies.Add(Enemy);
+
+            if (!BuildingAttacker.HasTarget)
+            {
+                TargetNext();
+            }
         }
     }
 
@@ -89,5 +94,13 @@ public class Building : MonoBehaviour
         }
 
         BuildingAttacker.SetTarget(NextHealth);
+    }
+
+    public void Placed()        // so the buildings don't function when they are just a grid system ghost
+    {
+        gameObject.GetComponent<LumberMillBonus>()?.Placed();       // add the bonus to the manager
+        gameObject.GetComponent<GoldMine>()?.Placed();          // start generating money
+        gameObject.tag = "Building";                            // changing the tag so that the enemy can attack it
+        CanAttack = true;                                   // so that the building can start attacking the enemies
     }
 }

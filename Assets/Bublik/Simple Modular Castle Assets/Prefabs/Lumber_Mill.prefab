@@ -192,6 +192,10 @@ GameObject:
   - component: {fileID: 835268948519375232}
   - component: {fileID: -8058245034937833320}
   - component: {fileID: 2472270722631482677}
+  - component: {fileID: -194486803050947988}
+  - component: {fileID: -7704318430033141357}
+  - component: {fileID: 312945881341336867}
+  - component: {fileID: 5939709298344932876}
   m_Layer: 6
   m_Name: Lumber_Mill
   m_TagString: Untagged
@@ -251,3 +255,59 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 8.59, y: 4.47, z: 6.13}
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &-194486803050947988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5770017181691229872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa6c9805be733fb4a8185095357b4465, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  StartingMaxHealth: 35
+  FlashColour: {r: 1, g: 0, b: 0, a: 1}
+  FlashDuration: 0.15
+--- !u!114 &-7704318430033141357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5770017181691229872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b686a4c0f5145b849a853038c6afcf25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Attacker
+  AttackDamage: 0
+  AttackRate: 0
+  KnockbackForce: 0
+--- !u!114 &312945881341336867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5770017181691229872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4af13c7c130b7a648ba58713c88366ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Building
+  Cost: 125
+--- !u!114 &5939709298344932876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5770017181691229872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d82cc6c3a48f814cb0bf669b81012c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LumberMillBonus
+  BonusAmount: 1

@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 8720448085654876692}
   - component: {fileID: 8275660727665125390}
   - component: {fileID: 7423423097130839355}
+  - component: {fileID: -6355731258195627076}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -240,3 +241,16 @@ MonoBehaviour:
   AttackDamage: 5
   AttackRate: 1
   KnockbackForce: 2
+--- !u!114 &-6355731258195627076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7425142273084211168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae72e1fa2fd8acc448f450f87dc3dc39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GiveMoneyOnDeath
+  GoldAmount: 5
