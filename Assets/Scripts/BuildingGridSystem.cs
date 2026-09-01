@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -16,6 +17,11 @@ public class BuildingGridSystem : MonoBehaviour
 
     [Header("Ghost Preview")]
     [SerializeField] private Shader ghostShader;
+
+    [Header("Building Type Prefabs")]
+    [SerializeField] private GameObject TowerPrefab;
+    [SerializeField] private GameObject MinePrefab;
+    [SerializeField] private GameObject MillPrefab;
 
     private GameObject PreviewObject;
     private Collider PreviewCollider;
@@ -91,6 +97,36 @@ public class BuildingGridSystem : MonoBehaviour
         {
             PlaceObject();
         }
+    }
+
+    public enum BuildingType
+    {
+        Tower,
+        Mine,
+        Mill
+    }
+
+    public void SwitchBuilding(BuildingType Type)
+    {
+        Deactivate();
+
+        switch (Type)
+        {
+            case BuildingType.Tower:
+                PlacingObject = TowerPrefab;
+            break;
+
+            case BuildingType.Mine:
+                PlacingObject = MinePrefab;
+            break;
+
+            case BuildingType.Mill:
+                PlacingObject = MillPrefab;
+            break;
+        }
+
+        isActive = true;
+        CreateGhostObject();
     }
 
     void CreateGhostObject()

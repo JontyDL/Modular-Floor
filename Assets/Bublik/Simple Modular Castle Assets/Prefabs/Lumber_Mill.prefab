@@ -268,6 +268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   StartingMaxHealth: 35
+  DestroyOnDeath: 1
   FlashColour: {r: 1, g: 0, b: 0, a: 1}
   FlashDuration: 0.15
 --- !u!114 &-7704318430033141357
@@ -298,6 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Building
   Cost: 125
+  IsMainTower: 0
 --- !u!114 &5939709298344932876
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,4 +312,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d82cc6c3a48f814cb0bf669b81012c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LumberMillBonus
-  BonusAmount: 1
+  BonusAmount: 5
