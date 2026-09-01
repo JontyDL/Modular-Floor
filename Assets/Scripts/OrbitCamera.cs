@@ -4,14 +4,17 @@ using UnityEngine.InputSystem;
 public class OrbitCamera : MonoBehaviour
 {
     public static OrbitCamera Instance { get; private set; }
+    
     [Header("Target")]
     [Tooltip("The point the camera orbits around.")]
     public Transform target;
+    
     [Header("Orbit Settings")]
     [Tooltip("Degrees orbited per unit of mouse delta, per second.")]
     public float orbitSpeed = 20f;
     [Tooltip("If true, the camera keeps looking at the target while orbiting.")]
     public bool lookAtTarget = true;
+    
     [Header("Cursor")]
     [Tooltip("Cursor shown while orbiting (right mouse button held). Reverts to whatever cursor was showing before when released.")]
     [SerializeField] private Texture2D orbitCursorTexture;

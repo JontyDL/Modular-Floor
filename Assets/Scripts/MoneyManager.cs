@@ -47,6 +47,9 @@ public class MoneyManager : MonoBehaviour
         } else
         {
             Gold += Amount;
+
+            if (Amount < 0)
+                StatCollector.Instance.SpendGold(Amount);
         }
         
         UpdateGold();

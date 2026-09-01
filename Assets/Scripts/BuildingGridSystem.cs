@@ -83,6 +83,8 @@ public class BuildingGridSystem : MonoBehaviour
     {
         if (isActive == false) return;
 
+        if (Time.timeScale == 0f) return;
+
         UpdateGhostPosition();
 
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && !EventSystem.current.IsPointerOverGameObject())

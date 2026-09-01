@@ -50,6 +50,7 @@ public class ProceduralFloor : MonoBehaviour
     [Header("Camera Target")]
     public bool setOrbitCameraTarget = true;
     private Transform centerTarget;
+    [SerializeField] private GameObject MainTower;
 
     [Header("Debug")]
     public bool showDebugPoints = true;
@@ -411,6 +412,8 @@ public class ProceduralFloor : MonoBehaviour
             OrbitCamera.Instance.target = centerTarget;
             Debug.Log("trying to set center target at: " + centerTarget.position);
         }
+
+        MainTower.transform.position = worldCenter;
     }
 
     public bool TryGetRandomEdgeSpawnPosition(out Vector3 WorldPosition, int MaxAttempts = 15)

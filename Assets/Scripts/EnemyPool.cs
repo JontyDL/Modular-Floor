@@ -22,6 +22,8 @@ public class EnemyPool : MonoBehaviour
 
         for (int i = 0; i < PreWarmCount; i++)
             Available.Push(CreateInstance());
+
+        StatCollector.Instance.ResetKillCount();
     }
     
     private PathFollower CreateInstance()

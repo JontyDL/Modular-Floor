@@ -32,6 +32,7 @@ public class WaveSpawner : MonoBehaviour
 
             yield return new WaitUntil(() => ActiveEnemyCount <= 0);
             Debug.Log($"Wave {CurrentWave} cleared");
+            StatCollector.Instance.WaveCompleted(CurrentWave);
 
             yield return new WaitForSeconds(TimeBetweenWaves);
         }
