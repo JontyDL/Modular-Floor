@@ -145,6 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   StartingMaxHealth: 100
+  DestroyOnDeath: 1
   FlashColour: {r: 1, g: 0, b: 0, a: 1}
   FlashDuration: 0.15
 --- !u!114 &4784751830420510514
@@ -174,7 +175,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af13c7c130b7a648ba58713c88366ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Building
-  Cost: 300
+  Cost: 225
+  IsMainTower: 0
 --- !u!114 &-2138125212275329525
 MonoBehaviour:
   m_ObjectHideFlags: 0
