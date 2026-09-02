@@ -6455,7 +6455,7 @@ MonoBehaviour:
   modeCursors:
   - mode: 1
     cursorTexture: {fileID: 2800000, guid: 36f4cdb07c9945d4c8c5444cac98e5ab, type: 3}
-    hotspot: {x: 100, y: 50}
+    hotspot: {x: 125, y: 125}
 --- !u!4 &1801723324
 Transform:
   m_ObjectHideFlags: 0
