@@ -17,6 +17,10 @@ public class PathFollower : MonoBehaviour
         AttackingBuilding           // diverted off the path to deal with a building in range
     }
 
+    [Header("Types")]
+    public string EnemyId { get; private set; }
+    public void SetPoolId(string id) => EnemyId = id;
+
     [Header("Line Following")]
     [SerializeField] private float LookAhead;
     [SerializeField] private float WanderAmplitude;
@@ -43,6 +47,7 @@ public class PathFollower : MonoBehaviour
 
     private Health CombatHealth;
     private Attacker CombatAttacker;
+    private DeadManBomb CombatBomb;
 
     // Buildings currently overlapping our trigger, in the order they were entered.
     // The first one is always the current target while AttackingBuilding.
@@ -54,6 +59,8 @@ public class PathFollower : MonoBehaviour
         NMAgent = GetComponent<NavMeshAgent>();
         CombatHealth = GetComponent<Health>();
         CombatAttacker = GetComponent<Attacker>();
+        CombatBomb = GetComponent<DeadManBomb>();
+
         NoiseSeed = Random.Range(0, 10000f);
         DefaultStoppingDistance = NMAgent.stoppingDistance;
         CombatHealth.OnDeath += HandleDeath;
@@ -64,6 +71,11 @@ public class PathFollower : MonoBehaviour
         NMAgent.speed = Stats.MoveSpeed;
         CombatHealth.SetMaxHealth(Stats.MaxHealth);
         CombatAttacker.SetStats(Stats.AttackDamage, Stats.AttackRate);
+
+        if (CombatBomb != null)
+        {
+            CombatBomb.BombDamage = Stats.AttackDamage;
+        }
     }
 
     public void ResetForPool()      // we call this to prepare an enemy after pulling it out of the pool
@@ -209,6 +221,15 @@ public class PathFollower : MonoBehaviour
 
         CurrentState = State.AttackingBuilding;
         CurrentBuildingTarget = Building;
+
+        if (CombatBomb != null)
+        {
+            CombatBomb.SelfDestruct(Building);
+            HandleDeath();
+            CombatHealth.TakeDamage(CombatHealth.MaxHealth);
+            yield return new WaitForEndOfFrame();
+        }
+
         Debug.Log($"Diverting to attack {Building.name}");
 
         float OriginalStoppingDistance = NMAgent.stoppingDistance;

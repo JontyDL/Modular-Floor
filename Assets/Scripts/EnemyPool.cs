@@ -6,10 +6,15 @@ public class EnemyPool : MonoBehaviour
 {
     public static EnemyPool Instance { get; private set; }
 
-    [SerializeField] private PathFollower EnemyPrefab;
-    [SerializeField] private int PreWarmCount;
+    [SerializeField] private List<EnemyDefinition> EnemyDefinitions;
 
-    private readonly Stack<PathFollower> Available = new Stack<PathFollower>();
+    public IReadOnlyList<EnemyDefinition> Definitions => EnemyDefinitions;
+
+    private readonly Dictionary<string, EnemyDefinition> DefinitionLookup = new Dictionary<string, EnemyDefinition>();
+
+    private readonly Dictionary<string, Stack<PathFollower>> Available = new Dictionary<string, Stack<PathFollower>>();
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -18,24 +23,50 @@ public class EnemyPool : MonoBehaviour
         } else
         {
             Destroy(gameObject);
+            return;
         }
 
-        for (int i = 0; i < PreWarmCount; i++)
-            Available.Push(CreateInstance());
+        foreach (EnemyDefinition def in EnemyDefinitions)
+        {
+            if (def == null) continue;
 
-        StatCollector.Instance.ResetKillCount();
+            if (DefinitionLookup.ContainsKey(def.EnemyID))
+            {
+                Debug.Log($"duplicate IDs on {def.EnemyID}");
+                continue;
+            }
+
+            DefinitionLookup.Add(def.EnemyID, def);
+
+            Stack<PathFollower> stack = new Stack<PathFollower>();
+            Available.Add(def.EnemyID, stack);
+
+            for (int i = 0; i < def.PreWarmCount; i++)
+            {
+                stack.Push(CreateInstance(def));
+            }
+
+            StatCollector.Instance.ResetKillCount();
+        }
     }
     
-    private PathFollower CreateInstance()
+    private PathFollower CreateInstance(EnemyDefinition def)
     {
-        PathFollower Ins = Instantiate(EnemyPrefab, transform);
+        PathFollower Ins = Instantiate(def.Prefab, transform);
         Ins.gameObject.SetActive(false);
+        Ins.SetPoolId(def.EnemyID);
         return Ins;
     }
 
-    public PathFollower Get(Vector3 pos)
+    public PathFollower Get(string enemyID, Vector3 pos)
     {
-        PathFollower enemy = Available.Count > 0 ? Available.Pop() : CreateInstance();
+        if (!DefinitionLookup.TryGetValue(enemyID, out EnemyDefinition def))
+        {
+            return null;
+        }
+
+        Stack<PathFollower> stack = Available[enemyID];
+        PathFollower enemy = stack.Count > 0 ? stack.Pop() : CreateInstance(def);
 
         enemy.ResetForPool();
         enemy.transform.SetPositionAndRotation(pos, Quaternion.identity);
@@ -57,8 +88,15 @@ public class EnemyPool : MonoBehaviour
         if (enemy == null)
             return;
 
+        if (!Available.TryGetValue(enemy.EnemyId, out Stack<PathFollower> stack))
+        {
+            Debug.LogError($"EnemyPool: tried to release enemy with unknown EnemyId '{enemy.EnemyId}'. Destroying instead.");
+            Destroy(enemy.gameObject);
+            return;
+        }
+
         enemy.gameObject.SetActive(false);
         enemy.transform.SetParent(transform);
-        Available.Push(enemy);
+        stack.Push(enemy);
     }
 }

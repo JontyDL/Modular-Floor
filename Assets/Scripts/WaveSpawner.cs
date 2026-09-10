@@ -1,10 +1,12 @@
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WaveSpawner : MonoBehaviour
 {
     [Header("Wave Rates")]
-    [SerializeField] private WaveScalingConfig Scaling;
+    [SerializeField] private WaveCountConfig CountScaling;
 
     [Header("Timing")]
     [SerializeField] private float InitialDelay = 5f;          // before the first wave
@@ -13,6 +15,8 @@ public class WaveSpawner : MonoBehaviour
 
     public int CurrentWave {  get; private set; }
     public int ActiveEnemyCount { get; private set; }
+
+    private readonly List<EnemyDefinition> EligibleBuffer = new List<EnemyDefinition>();
 
     private void Start()
     {
@@ -40,17 +44,58 @@ public class WaveSpawner : MonoBehaviour
 
     private IEnumerator SpawnWave(int WaveNumber)
     {
-        int count = Scaling.GetEnemyCount(WaveNumber);
-        EnemyStats stats = Scaling.GetStatsForWave(WaveNumber);
+        int count = CountScaling.GetEnemyCount(WaveNumber);
 
         for (int i = 0; i < count; ++i)
         {
-            SpawnEnemy(stats);
+            EnemyDefinition def = PickEnemyType(WaveNumber);
+            if (def != null)
+            {
+                SpawnEnemy(def, WaveNumber);
+            }
+
             yield return new WaitForSeconds(SpawnInterval);
         }
     }
 
-    private void SpawnEnemy(EnemyStats stats)
+    private EnemyDefinition PickEnemyType(int waveNumber)
+    {
+        IReadOnlyList<EnemyDefinition> all = EnemyPool.Instance.Definitions;
+
+        EligibleBuffer.Clear();
+        for (int i = 0; i < all.Count; i++)
+        {
+            if (all[i] != null && all[i].UnlockWave <= waveNumber)
+                EligibleBuffer.Add(all[i]);
+        }
+
+        IReadOnlyList<EnemyDefinition> pool = EligibleBuffer.Count > 0 ? EligibleBuffer : all;
+        if (pool.Count == 0)
+        {
+            Debug.LogError("WaveSpawner: no enemy definitions available to spawn.");
+            return null;
+        }
+
+        float totalWeight = 0f;
+        for (int i = 0; i < pool.Count; i++)
+            totalWeight += Mathf.Max(0f, pool[i].SpawnWeight);
+
+        if (totalWeight <= 0f)
+            return pool[Random.Range(0, pool.Count)];
+
+        float roll = Random.Range(0f, totalWeight);
+        float cumulative = 0f;
+        for (int i = 0; i < pool.Count; i++)
+        {
+            cumulative += Mathf.Max(0f, pool[i].SpawnWeight);
+            if (roll <= cumulative)
+                return pool[i];
+        }
+
+        return pool[pool.Count - 1];
+    }
+
+    private void SpawnEnemy(EnemyDefinition definition, int waveNumber)
     {
         if (!ProceduralFloor.Instance.TryGetRandomEdgeSpawnPosition(out Vector3 spawnPos))
         {
@@ -58,7 +103,12 @@ public class WaveSpawner : MonoBehaviour
             return;
         }
 
-        PathFollower enemy = EnemyPool.Instance.Get(spawnPos);
+        EnemyStats stats = definition.Scaling.GetStatsForWave(waveNumber);
+
+        PathFollower enemy = EnemyPool.Instance.Get(definition.EnemyID, spawnPos);
+        if (enemy == null)
+            return;
+
         enemy.Initialize(stats);
         ++ActiveEnemyCount;
 

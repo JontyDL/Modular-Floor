@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 538df625495193e4a97fbc493717ae99, type: 3}
+  m_Name: Basic Enemy
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDefinition
+  enemyID: basicenemy
+  prefab: {fileID: 3842759732279937858, guid: 551a7a0210445ee49ae063e67dfb8a77, type: 3}
+  scaling:
+    BaseHealth: 15
+    HealthGrowthPerWave: 2.5
+    MaxHealth: 65
+    BaseDamage: 5
+    DamageGrowthPerWave: 2
+    MaxDamage: 40
+    BaseSpeed: 4
+    SpeedGrowthPerWave: 0.2
+    MaxSpeed: 7.5
+    BaseAttackRate: 0.75
+    AttackRateGrowthPerWave: 0.025
+    MaxAttackRate: 2
+  spawnWeight: 0.9
+  unlockWave: 0
+  preWarmCount: 15

@@ -1095,22 +1095,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74ea0f6c8add09b4da08d916ba900f88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveSpawner
-  Scaling:
-    BaseEnemyCount: 3
+  CountScaling:
+    BaseEnemyCount: 7
     EnemyCountGrowthPerWave: 1.5
     MaxEnemyCount: 75
-    BaseHealth: 20
-    HealthGrowthPerWave: 4
-    MaxHealth: 500
-    BaseDamage: 5
-    DamageGrowthPerWave: 0.35
-    MaxDamage: 40
-    BaseSpeed: 3.5
-    SpeedGrowthPerWave: 0.05
-    MaxSpeed: 7
-    BaseAttackRate: 1
-    AttackRateGrowthPerWave: 0.02
-    MaxAttackRate: 2
   InitialDelay: 5
   SpawnInterval: 0.3
   TimeBetweenWaves: 10
@@ -5704,8 +5692,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4446401846a3abe4c83090133046ec3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPool
-  EnemyPrefab: {fileID: 3842759732279937858, guid: 551a7a0210445ee49ae063e67dfb8a77, type: 3}
-  PreWarmCount: 25
+  EnemyDefinitions:
+  - {fileID: 11400000, guid: eedbf197625768948811cfa3a1ec0be0, type: 2}
+  - {fileID: 11400000, guid: 9136c2ce421aedb44866492c44aec2a0, type: 2}
+  - {fileID: 11400000, guid: 2c16a43f32a9eca4995ec8c41c3ecd61, type: 2}
 --- !u!4 &1594742628
 Transform:
   m_ObjectHideFlags: 0

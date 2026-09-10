@@ -4,11 +4,6 @@ using UnityEngine;
 [Serializable]
 public class WaveScalingConfig
 {
-    [Header("Enemy Count")]
-    [SerializeField] private int BaseEnemyCount = 5;
-    [SerializeField] private float EnemyCountGrowthPerWave = 1.5f;
-    [SerializeField] private int MaxEnemyCount = 75;
-
     [Header("Health")]
     [SerializeField] private float BaseHealth = 20f;
     [SerializeField] private float HealthGrowthPerWave = 4f;
@@ -28,13 +23,6 @@ public class WaveScalingConfig
     [SerializeField] private float BaseAttackRate = 1f;
     [SerializeField] private float AttackRateGrowthPerWave = 0.02f;
     [SerializeField] private float MaxAttackRate = 2f;
-
-    public int GetEnemyCount(int waveNumber)
-    {
-        int w = Mathf.Max(0, waveNumber - 1);
-        float raw = BaseEnemyCount + w * EnemyCountGrowthPerWave;
-        return Mathf.Clamp(Mathf.RoundToInt(raw), BaseEnemyCount, MaxEnemyCount);
-    }
 
     public EnemyStats GetStatsForWave(int waveNumber)
     {
