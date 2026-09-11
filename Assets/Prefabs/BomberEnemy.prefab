@@ -103,4 +103,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DeadManBomb
   ExplosionVFX: {fileID: 6349170587643239544, guid: 1785d0e8c5ca0ca499a0b9d031665899, type: 3}
   BombDamage: 35
-  BombRange: 10
+  BombRange: 15

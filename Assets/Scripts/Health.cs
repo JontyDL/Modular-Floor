@@ -76,6 +76,12 @@ public class Health : MonoBehaviour
 
             OnDeath?.Invoke();
 
+            if (gameObject.TryGetComponent<DeadManBomb>(out DeadManBomb dmb))
+            {
+                gameObject.TryGetComponent<Attacker>(out Attacker atk);
+                dmb.SelfDestruct(atk.CurrentTargetTransform);
+            }
+
             if (DestroyOnDeath)
                 Destroy(gameObject);
             // play some death sfx here

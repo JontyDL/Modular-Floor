@@ -16,4 +16,9 @@ public class BuildingSwapper : MonoBehaviour
     {
         BuildingGridSystem.Instance.SwitchBuilding(BuildingGridSystem.BuildingType.Mill);
     }
+
+    public void SwitchToBomb()
+    {
+        BuildingGridSystem.Instance.SwitchBuilding(BuildingGridSystem.BuildingType.Bomb);
+    }
 }

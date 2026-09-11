@@ -5,15 +5,26 @@ public class DeadManBomb : MonoBehaviour
     [SerializeField] GameObject ExplosionVFX;
     public float BombDamage;
     [SerializeField] private float BombRange;
-
-    public void SelfDestruct(Transform TargetBuilding)
+    [SerializeField] private bool SelfDestroy = false;
+    public void SelfDestruct(Transform Target)
     {
         Instantiate(ExplosionVFX, transform.position, Quaternion.identity);
 
-        if (Vector3.Distance(transform.position, TargetBuilding.transform.position) < BombRange)
-        if (TargetBuilding.TryGetComponent<Health>(out Health H))
+        if (Target != null)
         {
-            H.TakeDamage(BombDamage);
+            if (Vector3.Distance(transform.position, Target.transform.position) < BombRange)
+            {
+                if (Target.TryGetComponent<Health>(out Health H))
+                {
+                    H.TakeDamage(BombDamage);
+                }
+            }
         }
+
+        if (SelfDestroy)
+        {
+            Destroy(gameObject);
+        }
+
     }
 }

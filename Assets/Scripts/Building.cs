@@ -11,6 +11,7 @@ public class Building : MonoBehaviour
     private bool CanAttack = false;
     public int Cost;
     public bool IsMainTower = false;
+    [SerializeField] private GameObject RangeRing;
     // Enemies currently in range, in the order they entered. First is always the current target.
     private readonly List<Transform> NearbyEnemies = new List<Transform>();
 
@@ -107,7 +108,12 @@ public class Building : MonoBehaviour
     {
         gameObject.GetComponent<LumberMillBonus>()?.Placed();       // add the bonus to the manager
         gameObject.GetComponent<GoldMine>()?.Placed();          // start generating money
-        gameObject.tag = "Building";                            // changing the tag so that the enemy can attack it
+        
+        if (!gameObject.TryGetComponent<DeadManBomb>(out DeadManBomb bomb))     // we don't want to set the tag if it's a bomb, as enemies shouldn't attack a landmine
+            gameObject.tag = "Building";                            // changing the tag so that the enemy can attack it
+        
         CanAttack = true;                                   // so that the building can start attacking the enemies
+        if (RangeRing != null)
+            RangeRing.SetActive(false);
     }
 }

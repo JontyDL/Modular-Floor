@@ -78,6 +78,11 @@ public class Attacker : MonoBehaviour
             Health CurrentTarget = TargetHealth;
             if (CurrentTarget == null) break;
 
+            if (gameObject.TryGetComponent(out DeadManBomb bomb))
+            {
+                bomb.SelfDestruct(CurrentTargetTransform);
+            }
+
             CurrentTarget.TakeDamage(AttackDamage);
             float Interval = AttackRate > 0f ? 1f / AttackRate : 1f;
             NextAttackTime = Time.time + Interval;

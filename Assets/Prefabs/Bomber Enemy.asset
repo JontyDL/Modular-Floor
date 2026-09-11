@@ -27,6 +27,6 @@ MonoBehaviour:
     BaseAttackRate: 1
     AttackRateGrowthPerWave: 0.02
     MaxAttackRate: 2
-  spawnWeight: 0.4
+  spawnWeight: 0.35
   unlockWave: 2
   preWarmCount: 5

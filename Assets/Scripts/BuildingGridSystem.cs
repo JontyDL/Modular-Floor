@@ -22,6 +22,7 @@ public class BuildingGridSystem : MonoBehaviour
     [SerializeField] private GameObject TowerPrefab;
     [SerializeField] private GameObject MinePrefab;
     [SerializeField] private GameObject MillPrefab;
+    [SerializeField] private GameObject BombPrefab;
 
     private GameObject PreviewObject;
     private Collider PreviewCollider;
@@ -103,7 +104,8 @@ public class BuildingGridSystem : MonoBehaviour
     {
         Tower,
         Mine,
-        Mill
+        Mill,
+        Bomb
     }
 
     public void SwitchBuilding(BuildingType Type)
@@ -122,6 +124,10 @@ public class BuildingGridSystem : MonoBehaviour
 
             case BuildingType.Mill:
                 PlacingObject = MillPrefab;
+            break;
+
+            case BuildingType.Bomb:
+                PlacingObject = BombPrefab;
             break;
         }
 
