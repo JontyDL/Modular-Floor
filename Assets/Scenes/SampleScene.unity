@@ -2142,13 +2142,14 @@ GameObject:
   - component: {fileID: 616942793}
   - component: {fileID: 616942795}
   - component: {fileID: 616942794}
+  - component: {fileID: 616942796}
   m_Layer: 7
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &616942793
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2169,10 +2170,10 @@ RectTransform:
   - {fileID: 1374688742}
   m_Father: {fileID: 1799496926}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -723.4651, y: -8.151672}
-  m_SizeDelta: {x: -1565.1299, y: -105.9724}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 235, y: -550}
+  m_SizeDelta: {x: 354.87012, y: 974.0276}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &616942794
 MonoBehaviour:
@@ -2212,6 +2213,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 616942792}
   m_CullTransparentMesh: 1
+--- !u!114 &616942796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 616942792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9bc63a5727515249a6b075b80a78839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISlide
+  panel: {fileID: 616942793}
+  hiddenPosition: {x: -190, y: -550}
+  shownPosition: {x: 235, y: -550}
+  duration: 0.25
 --- !u!1 &618487085
 GameObject:
   m_ObjectHideFlags: 0
@@ -5268,6 +5285,7 @@ GameObject:
   - component: {fileID: 1324531455}
   - component: {fileID: 1324531454}
   - component: {fileID: 1324531457}
+  - component: {fileID: 1324531458}
   m_Layer: 5
   m_Name: Buildbtn
   m_TagString: Untagged
@@ -5290,10 +5308,10 @@ RectTransform:
   - {fileID: 1805453151}
   m_Father: {fileID: 1820119889}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 508, y: -439}
-  m_SizeDelta: {x: 179.1, y: 55.7}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -400, y: 75}
+  m_SizeDelta: {x: 179.09998, y: 55.700012}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1324531454
 MonoBehaviour:
@@ -5351,7 +5369,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1799496922}
+      - m_Target: {fileID: 616942792}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -5363,10 +5381,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1820119885}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1324531458}
+        m_TargetAssemblyTypeName: UISlide, Assembly-CSharp
+        m_MethodName: Deactivate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1834452147}
+        m_TargetAssemblyTypeName: UISlide, Assembly-CSharp
+        m_MethodName: Deactivate
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5427,6 +5457,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ModeToggleButton
   mode: 2
   activeIndicator: {fileID: 0}
+--- !u!114 &1324531458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324531452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9bc63a5727515249a6b075b80a78839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISlide
+  panel: {fileID: 1324531453}
+  hiddenPosition: {x: -400, y: -50}
+  shownPosition: {x: -400, y: 75}
+  duration: 0.2
 --- !u!1 &1374688741
 GameObject:
   m_ObjectHideFlags: 0
@@ -5522,7 +5568,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1799496922}
+      - m_Target: {fileID: 616942796}
+        m_TargetAssemblyTypeName: UISlide, Assembly-CSharp
+        m_MethodName: Deactivate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1834452141}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -5532,9 +5590,9 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1820119885}
+      - m_Target: {fileID: 1324531452}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -6939,7 +6997,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1799496923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7339,6 +7397,7 @@ GameObject:
   - component: {fileID: 1834452144}
   - component: {fileID: 1834452143}
   - component: {fileID: 1834452146}
+  - component: {fileID: 1834452147}
   m_Layer: 5
   m_Name: Destroybtn
   m_TagString: Untagged
@@ -7361,10 +7420,10 @@ RectTransform:
   - {fileID: 1797196214}
   m_Father: {fileID: 1820119889}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 744, y: -439}
-  m_SizeDelta: {x: 179.1, y: 55.7}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -190, y: 75}
+  m_SizeDelta: {x: 179.09998, y: 55.700012}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1834452143
 MonoBehaviour:
@@ -7474,6 +7533,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ModeToggleButton
   mode: 1
   activeIndicator: {fileID: 0}
+--- !u!114 &1834452147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1834452141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9bc63a5727515249a6b075b80a78839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISlide
+  panel: {fileID: 1834452142}
+  hiddenPosition: {x: -190, y: -50}
+  shownPosition: {x: -190, y: 75}
+  duration: 0.2
 --- !u!1 &1868199647
 GameObject:
   m_ObjectHideFlags: 0
