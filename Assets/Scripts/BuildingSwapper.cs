@@ -21,4 +21,9 @@ public class BuildingSwapper : MonoBehaviour
     {
         BuildingGridSystem.Instance.SwitchBuilding(BuildingGridSystem.BuildingType.Bomb);
     }
+
+    public void SwitchToSpell()
+    {
+        BuildingGridSystem.Instance.SwitchBuilding(BuildingGridSystem.BuildingType.Spell);
+    }
 }

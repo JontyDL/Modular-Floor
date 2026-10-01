@@ -108,8 +108,9 @@ public class Building : MonoBehaviour
     {
         gameObject.GetComponent<LumberMillBonus>()?.Placed();       // add the bonus to the manager
         gameObject.GetComponent<GoldMine>()?.Placed();          // start generating money
+        gameObject.GetComponent<SpellAOE>()?.Placed();          // start affecting enemies and buildings alike
         
-        if (!gameObject.TryGetComponent<DeadManBomb>(out DeadManBomb bomb))     // we don't want to set the tag if it's a bomb, as enemies shouldn't attack a landmine
+        if (!gameObject.TryGetComponent<DeadManBomb>(out DeadManBomb bomb) || !gameObject.TryGetComponent<SpellAOE>(out SpellAOE SAOE))     // we don't want to set the tag if it's a bomb or Spell, as enemies shouldn't attack them
             gameObject.tag = "Building";                            // changing the tag so that the enemy can attack it
         
         CanAttack = true;                                   // so that the building can start attacking the enemies

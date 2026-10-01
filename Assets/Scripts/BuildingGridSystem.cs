@@ -23,6 +23,7 @@ public class BuildingGridSystem : MonoBehaviour
     [SerializeField] private GameObject MinePrefab;
     [SerializeField] private GameObject MillPrefab;
     [SerializeField] private GameObject BombPrefab;
+    [SerializeField] private GameObject SpellPrefab;
 
     private GameObject PreviewObject;
     private Collider PreviewCollider;
@@ -105,7 +106,8 @@ public class BuildingGridSystem : MonoBehaviour
         Tower,
         Mine,
         Mill,
-        Bomb
+        Bomb,
+        Spell
     }
 
     public void SwitchBuilding(BuildingType Type)
@@ -129,6 +131,11 @@ public class BuildingGridSystem : MonoBehaviour
             case BuildingType.Bomb:
                 PlacingObject = BombPrefab;
             break;
+
+            case BuildingType.Spell:
+                PlacingObject = SpellPrefab;
+            break;
+
         }
 
         isActive = true;

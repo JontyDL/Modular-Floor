@@ -17,6 +17,9 @@ public class Health : MonoBehaviour
     public float CurrentHealth { get; private set; }
     public bool IsDead => CurrentHealth <= 0f;
 
+    private int doubleDamageSources = 0;
+    public bool DoubleDamage => doubleDamageSources > 0;
+
     public event Action OnDeath;
 
     private Renderer[] CachedRenderers;         // saving all the renderers and materials from an object so that we can flash when we take damage
@@ -62,7 +65,13 @@ public class Health : MonoBehaviour
     {
         if (IsDead || Amount <= 0f) return;
 
-        CurrentHealth = Mathf.Max(0f, CurrentHealth - Amount);
+        if (DoubleDamage)
+        {
+            CurrentHealth = Mathf.Max(0f, CurrentHealth - ( 2 * Amount));       // this person is in the spell, and should take double the damage
+        } else
+        {
+            CurrentHealth = Mathf.Max(0f, CurrentHealth - Amount);
+        }
 
         if (CurrentHealth <= 0f)
         {
@@ -188,5 +197,15 @@ public class Health : MonoBehaviour
                 if (Mat != null) Destroy(Mat);
             }
         }
+    }
+
+    public void AddDoubleDamageSource()
+    {
+        doubleDamageSources++;
+    }
+
+    public void RemoveDoubleDamageSource()
+    {
+        doubleDamageSources = Mathf.Max(0, doubleDamageSources - 1);
     }
 }
