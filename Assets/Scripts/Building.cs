@@ -38,6 +38,8 @@ public class Building : MonoBehaviour
 
     private void OnTriggerEnter(Collider Other)
     {
+        if (Other.isTrigger) return;
+
         if (CanAttack)
         {
             Transform Enemy = ResolveRoot(Other);
@@ -110,7 +112,7 @@ public class Building : MonoBehaviour
         gameObject.GetComponent<GoldMine>()?.Placed();          // start generating money
         gameObject.GetComponent<SpellAOE>()?.Placed();          // start affecting enemies and buildings alike
         
-        if (!gameObject.TryGetComponent<DeadManBomb>(out DeadManBomb bomb) || !gameObject.TryGetComponent<SpellAOE>(out SpellAOE SAOE))     // we don't want to set the tag if it's a bomb or Spell, as enemies shouldn't attack them
+        if (!gameObject.TryGetComponent<DeadManBomb>(out DeadManBomb bomb) && !gameObject.TryGetComponent<SpellAOE>(out SpellAOE SAOE))     // we don't want to set the tag if it's a bomb or Spell, as enemies shouldn't attack them
             gameObject.tag = "Building";                            // changing the tag so that the enemy can attack it
         
         CanAttack = true;                                   // so that the building can start attacking the enemies

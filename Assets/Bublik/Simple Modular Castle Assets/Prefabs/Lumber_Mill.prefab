@@ -300,6 +300,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Building
   Cost: 125
   IsMainTower: 0
+  RangeRing: {fileID: 0}
 --- !u!114 &5939709298344932876
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -184,6 +184,7 @@ public class PathFollower : MonoBehaviour
         if (!isActiveAndEnabled) return;
 
         Transform Building = ResolveRoot(Other);
+
         if (!Building.CompareTag("Building")) return;
 
         if (NearbyBuildings.Contains(Building)) return;
