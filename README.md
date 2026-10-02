@@ -16,6 +16,18 @@ Currently the game uses some PCG techniques, mainly a seedbased randomisation to
 
 The nav mesh automatically recalculates to match the terrain after the mesh is generated and the forests are scattered.
 
+Enemies have been added, and follow some simple and more complicated rules. Enemies are spawned along the fringes of the map, they then pathfind towards the closest pathway to the tower, following it towards and attacking the central tower, diverting to attack any defenders along the way. All enemies are reused through an asset pool and and scale with increasing difficulty as the game progresses.
+
+<img width="3840" height="1080" alt="PathingStrategy" src="https://github.com/user-attachments/assets/39dbb9b1-659e-4d22-baa0-29f7430b2d21" />
+
+There are currently 3 Enemy types, a standard enemy with average speed, damage and health, there is a tank with high damage and health, but low speed, and a Bomber enemy, that has high speed and low health, that blows up once it reaches it's destination, dealing very high damage.
+
+There are 5 tools in the players' toolkit that they can use to defend against these attackers, assuming that the play has the gold necessary to buy them. A typical archery tower, that attacks anything within it's range, a mill that increases the amount of gold earned for every enemy kill, a mine that generates gold over time, a bomb (with a ring demonstrating it's range) that explodes when an enemy gets too close, and a spell (scaled down to fit in the image) that doubles the damage that any attacker or defender may recieve if they are in the spell.
+
+<img width="1116" height="617" alt="image" src="https://github.com/user-attachments/assets/5c56e3a4-6ba3-47d9-a374-b9f96c4f5684" />
+
+
+
 The tree's sway in the wind thanks to a shader made by Nicrom, you can access it here for free:
 https://assetstore-fallback.unity.com/packages/vfx/shaders/low-poly-wind-182586
 Many thanks go your way!
