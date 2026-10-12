@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -37,7 +38,7 @@ public class Attacker : MonoBehaviour
         if (AttackRoutine != null) StopCoroutine(AttackRoutine);
         TargetHealth = Target;
 
-        if (TargetHealth != null)
+        if (TargetHealth != null && isActiveAndEnabled)
         {
             TargetHealth.OnDeath += HandleTargetDeath;
             AttackRoutine = StartCoroutine(AttackLoop());
@@ -63,6 +64,8 @@ public class Attacker : MonoBehaviour
         // Pooled targets (e.g. enemies) survive as deactivated-but-not-destroyed
         // objects, so we can't rely on TargetHealth going fake-null anymore -
         // OnDeath is now the source of truth for "this target is gone".
+        if (this == null) return;
+
         StopAttacking();
         OnTargetLost?.Invoke();
     }
@@ -81,6 +84,7 @@ public class Attacker : MonoBehaviour
             if (gameObject.TryGetComponent(out DeadManBomb bomb))
             {
                 bomb.SelfDestruct(CurrentTargetTransform);
+                if (this == null) yield break;
             }
 
             CurrentTarget.TakeDamage(AttackDamage);
@@ -112,5 +116,16 @@ public class Attacker : MonoBehaviour
         Direction.Normalize();
 
         TargetAgent.Move(Direction * KnockbackForce);           // displaces the agent, but keeps it on the navmesh
+    }
+
+    private void OnDisable()
+    {
+        StopAttacking();
+    }
+
+    private void OnDestroy()
+    {
+        if (TargetHealth != null)
+            TargetHealth.OnDeath -= HandleTargetDeath;
     }
 }
