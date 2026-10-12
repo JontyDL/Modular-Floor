@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0777d029ed3dffa4692f417d4aba19ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.DecalProjector
-  m_Material: {fileID: 2100000, guid: cf8b1dcc8d5781249b71288b4fd7d45e, type: 2}
+  m_Material: {fileID: 2100000, guid: 31b0051f39dcd6e409c0d0a89564da61, type: 2}
   m_DrawDistance: 1000
   m_FadeScale: 0.9
   m_StartAngleFade: 180
@@ -134,7 +134,7 @@ MonoBehaviour:
   DestroyOnDeath: 1
   FlashColour: {r: 1, g: 0, b: 0, a: 1}
   FlashDuration: 0.15
-  DoubleDamage: 0
+  doubleDamageSources: 0
 --- !u!114 &894387423379349965
 MonoBehaviour:
   m_ObjectHideFlags: 0
