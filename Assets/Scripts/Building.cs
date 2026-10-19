@@ -15,15 +15,52 @@ public class Building : MonoBehaviour
     // Enemies currently in range, in the order they entered. First is always the current target.
     private readonly List<Transform> NearbyEnemies = new List<Transform>();
 
+    // ---- Range (used by the upgrade system) ----
+    private SphereCollider RangeCollider;
+    public bool HasRange => RangeCollider != null;
+
     private void Awake()
     {
         BuildingHealth = GetComponent<Health>();
         BuildingAttacker = GetComponent<Attacker>();
 
-        Collider AttackRange = GetComponent<Collider>();
+        // The range is the trigger sphere. Buildings without one (gold mine, lumber mill) simply have no upgradeable range.
+        foreach (SphereCollider Sphere in GetComponents<SphereCollider>())
+        {
+            if (Sphere.isTrigger)
+            {
+                RangeCollider = Sphere;
+                break;
+            }
+        }
 
         if (IsMainTower)
             CanAttack = true;
+    }
+
+    public float Range
+    {
+        get => RangeCollider != null ? RangeCollider.radius : 0f;
+        set
+        {
+            if (RangeCollider == null) return;
+
+            float OldRadius = RangeCollider.radius;
+            float NewRadius = Mathf.Max(0.1f, value);
+            if (Mathf.Approximately(OldRadius, NewRadius)) return;
+
+            RangeCollider.radius = NewRadius;
+
+            // Scale the ring by the same ratio so it keeps matching the collider
+            if (RangeRing != null && OldRadius > 0f)
+                RangeRing.transform.localScale *= NewRadius / OldRadius;
+        }
+    }
+
+    public void ShowRangeRing(bool Show)
+    {
+        if (RangeRing != null)
+            RangeRing.SetActive(Show);
     }
 
     private void OnEnable()

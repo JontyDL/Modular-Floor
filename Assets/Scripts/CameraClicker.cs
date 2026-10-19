@@ -64,9 +64,14 @@ public class CameraClicker : MonoBehaviour
         Ray ray = targetCamera.ScreenPointToRay(screenPos);
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, interactableLayers))
         {
-            if (hit.collider.TryGetComponent<IInteractable>(out var interactable))
+            IInteractable[] interactables = hit.collider.GetComponents<IInteractable>();
+
+            if (interactables.Length > 0)
             {
-                interactable.OnInteract(InteractionModeManager.Instance.CurrentMode);
+                foreach (var interactable in interactables)
+                {
+                    interactable.OnInteract(InteractionModeManager.Instance.CurrentMode);
+                }
             }
         }
     }

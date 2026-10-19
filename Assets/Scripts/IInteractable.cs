@@ -5,7 +5,8 @@ public enum InteractionMode             // the different actions I'll be able to
 {
     None,
     Destroy,
-    Build
+    Build,
+    Upgrade
 }
 
 public interface IInteractable

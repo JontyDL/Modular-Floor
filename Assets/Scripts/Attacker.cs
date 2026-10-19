@@ -22,6 +22,26 @@ public class Attacker : MonoBehaviour
 
     public event System.Action OnTargetLost;            // when our target dies
 
+    // Public accessors so the upgrade system can read and change individual stats.
+    public float Damage
+    {
+        get => AttackDamage;
+        set => AttackDamage = Mathf.Max(0f, value);
+    }
+
+    public float Rate
+    {
+        get => AttackRate;
+        set => AttackRate = Mathf.Max(0f, value);   // AttackLoop re-reads this every swing, so changes apply on the next attack
+    }
+
+    public float Knockback
+    {
+        get => KnockbackForce;
+        set => KnockbackForce = Mathf.Max(0f, value);
+    }
+
+
     public void SetStats(float Damage, float Rate)
     {
         AttackDamage = Damage;

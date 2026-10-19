@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4633741374054182091}
   - component: {fileID: 8528748895340292684}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: RangePreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 7243628391734852531}
   - component: {fileID: 5226738206578685675}
   - component: {fileID: -6921190020824930214}
+  - component: {fileID: -2122109145481404498}
   m_Layer: 6
   m_Name: Wooden_Tower
   m_TagString: Untagged
@@ -290,3 +291,64 @@ MonoBehaviour:
   Cost: 75
   IsMainTower: 0
   RangeRing: {fileID: 6697988469824555879}
+--- !u!114 &-2122109145481404498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7173998236604818472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10e51da5793624b47bba392d36dedcb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeableObject
+  HealthUpgrade:
+    Step: 15
+    BaseCost: 40
+    CostGrowth: 1.5
+    MaxLevel: 3
+    Level: 0
+  DamageUpgrade:
+    Step: 5
+    BaseCost: 45
+    CostGrowth: 1.5
+    MaxLevel: 5
+    Level: 0
+  RangeUpgrade:
+    Step: 5
+    BaseCost: 70
+    CostGrowth: 1.5
+    MaxLevel: 3
+    Level: 0
+  AttackRateUpgrade:
+    Step: 0.15
+    BaseCost: 90
+    CostGrowth: 1.5
+    MaxLevel: 3
+    Level: 0
+  KnockbackUpgrade:
+    Step: 0.5
+    BaseCost: 40
+    CostGrowth: 1.5
+    MaxLevel: 3
+    Level: 0
+  LumberBonusUpgrade:
+    Step: 2
+    BaseCost: 80
+    CostGrowth: 1.5
+    MaxLevel: 3
+    Level: 0
+  GoldAmountUpgrade:
+    Step: 1
+    BaseCost: 90
+    CostGrowth: 1.5
+    MaxLevel: 3
+    Level: 0
+  GoldDelayUpgrade:
+    Step: -0.2
+    BaseCost: 80
+    CostGrowth: 1.5
+    MaxLevel: 4
+    Level: 0
+  MinGoldDelay: 0.3

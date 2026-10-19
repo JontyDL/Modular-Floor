@@ -15,15 +15,15 @@ MonoBehaviour:
   enemyID: basicenemy
   prefab: {fileID: 3842759732279937858, guid: 551a7a0210445ee49ae063e67dfb8a77, type: 3}
   scaling:
-    BaseHealth: 15
-    HealthGrowthPerWave: 2.5
-    MaxHealth: 65
+    BaseHealth: 30
+    HealthGrowthPerWave: 5
+    MaxHealth: 95
     BaseDamage: 5
     DamageGrowthPerWave: 2
     MaxDamage: 40
-    BaseSpeed: 4
-    SpeedGrowthPerWave: 0.2
-    MaxSpeed: 7.5
+    BaseSpeed: 5
+    SpeedGrowthPerWave: 0.25
+    MaxSpeed: 8
     BaseAttackRate: 0.75
     AttackRateGrowthPerWave: 0.025
     MaxAttackRate: 2

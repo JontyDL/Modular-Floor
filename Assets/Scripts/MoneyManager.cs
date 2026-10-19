@@ -7,6 +7,8 @@ public class MoneyManager : MonoBehaviour
 {
     public static MoneyManager Instance {  get; private set; }
 
+    [SerializeField] UpgradePanel UpgPanel;
+
     [SerializeField] private TextMeshProUGUI GoldDisplaytxt;
 
     [SerializeField] private Int64 Gold = 0;
@@ -58,5 +60,6 @@ public class MoneyManager : MonoBehaviour
     private void UpdateGold()
     {
         GoldDisplaytxt.text = Gold.ToString("N0", CultureInfo.InvariantCulture);
+        UpgPanel.OnGoldChanged();
     }
 }

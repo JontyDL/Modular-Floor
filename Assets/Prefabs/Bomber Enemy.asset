@@ -16,17 +16,17 @@ MonoBehaviour:
   prefab: {fileID: 7690212020545097655, guid: c2e1aff258138d5469b5d92644125e63, type: 3}
   scaling:
     BaseHealth: 20
-    HealthGrowthPerWave: 4
-    MaxHealth: 60
-    BaseDamage: 35
-    DamageGrowthPerWave: 2.5
-    MaxDamage: 50
+    HealthGrowthPerWave: 5
+    MaxHealth: 80
+    BaseDamage: 45
+    DamageGrowthPerWave: 5
+    MaxDamage: 80
     BaseSpeed: 7
-    SpeedGrowthPerWave: 0.4
+    SpeedGrowthPerWave: 0.5
     MaxSpeed: 12.5
     BaseAttackRate: 1
     AttackRateGrowthPerWave: 0.02
     MaxAttackRate: 2
   spawnWeight: 0.35
   unlockWave: 2
-  preWarmCount: 5
+  preWarmCount: 8

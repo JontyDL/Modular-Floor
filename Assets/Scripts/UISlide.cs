@@ -20,6 +20,20 @@ public class UISlide : MonoBehaviour
         slideCoroutine = StartCoroutine(Slide(shownPosition));
     }
 
+    public void Show()
+    {
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);     // OnEnable does the slide-in
+            return;
+        }
+
+        if (slideCoroutine != null)
+            StopCoroutine(slideCoroutine);
+
+        slideCoroutine = StartCoroutine(Slide(shownPosition));
+    }
+
     public void Deactivate()
     {
         if (slideCoroutine != null)

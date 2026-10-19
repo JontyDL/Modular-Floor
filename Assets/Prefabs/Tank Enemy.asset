@@ -22,11 +22,11 @@ MonoBehaviour:
     DamageGrowthPerWave: 2
     MaxDamage: 40
     BaseSpeed: 2
-    SpeedGrowthPerWave: 0.05
+    SpeedGrowthPerWave: 0.15
     MaxSpeed: 5
     BaseAttackRate: 0.3
     AttackRateGrowthPerWave: 0.05
-    MaxAttackRate: 1
+    MaxAttackRate: 0.85
   spawnWeight: 0.35
   unlockWave: 3
-  preWarmCount: 3
+  preWarmCount: 5
