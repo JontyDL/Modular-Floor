@@ -47,6 +47,12 @@ public class ProceduralFloor : MonoBehaviour
     private System.Random terrainRng;
     private System.Random vegetationRng;
 
+    [Header("Exposed Dimensions")]
+    public int GridSize => size;
+    public float GridSpacing => spacing;
+    public float MapExtent => (size - 1) * spacing;
+    public Transform FloorTransform => transform;
+
     [Header("Camera Target")]
     public bool setOrbitCameraTarget = true;
     private Transform centerTarget;

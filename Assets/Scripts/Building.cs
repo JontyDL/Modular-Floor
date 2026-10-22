@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Health))]
 [RequireComponent(typeof(Attacker))]
@@ -19,6 +20,10 @@ public class Building : MonoBehaviour
     private SphereCollider RangeCollider;
     public bool HasRange => RangeCollider != null;
 
+    private float BaseRange;
+    private float WeatherRangeMultiplier = 1f;
+    private Vector3 BaseRangeRingScale;
+
     private void Awake()
     {
         BuildingHealth = GetComponent<Health>();
@@ -34,26 +39,50 @@ public class Building : MonoBehaviour
             }
         }
 
+        if (RangeCollider != null)
+        {
+            BaseRange = RangeCollider.radius;
+        }
+
+        if (RangeRing != null)
+        {
+            BaseRangeRingScale = RangeRing.transform.localScale;
+        }
+
         if (IsMainTower)
             CanAttack = true;
     }
 
     public float Range
     {
-        get => RangeCollider != null ? RangeCollider.radius : 0f;
+        get => BaseRange;
         set
         {
             if (RangeCollider == null) return;
 
-            float OldRadius = RangeCollider.radius;
-            float NewRadius = Mathf.Max(0.1f, value);
-            if (Mathf.Approximately(OldRadius, NewRadius)) return;
+            BaseRange = Mathf.Max(0.1f, value);
+            ApplyEffectiveRange();
+        }
+    }
 
-            RangeCollider.radius = NewRadius;
+    public void SetWeatherRangeMultiplier(float Multiplier)
+    {
+        WeatherRangeMultiplier = Mathf.Clamp(Multiplier, 0.1f, 1f);
+        ApplyEffectiveRange();
+    }
 
-            // Scale the ring by the same ratio so it keeps matching the collider
-            if (RangeRing != null && OldRadius > 0f)
-                RangeRing.transform.localScale *= NewRadius / OldRadius;
+    private void ApplyEffectiveRange()
+    {
+        if (RangeCollider == null) return;
+
+        float EffectiveRange = Mathf.Max(0.1f, BaseRange * WeatherRangeMultiplier);
+
+        RangeCollider.radius = EffectiveRange;
+
+        if (RangeRing != null)
+        {
+            float ratio = EffectiveRange / Mathf.Max(0.1f, BaseRange);
+            RangeRing.transform.localScale = BaseRangeRingScale * ratio;
         }
     }
 
@@ -155,5 +184,39 @@ public class Building : MonoBehaviour
         CanAttack = true;                                   // so that the building can start attacking the enemies
         if (RangeRing != null)
             RangeRing.SetActive(false);
+    }
+
+    public void RefreshEnemyDetection()     // we are going to be scaling the range of a building up and down with fog, we should ensure no old references persist with range changes
+    {
+        if (RangeCollider == null || !CanAttack) return;
+
+        NearbyEnemies.Clear();
+
+        Bounds bounds = RangeCollider.bounds;
+
+        Collider[] Hits = Physics.OverlapSphere(bounds.center, bounds.extents.x);
+
+        foreach (Collider hit in Hits)
+        {
+            if (hit.isTrigger) continue;
+
+            Transform enemy = ResolveRoot(hit);
+
+            if (enemy == null || !enemy.CompareTag("Enemy")) continue;
+
+            Health health = enemy.GetComponent<Health>();
+
+            if (health == null || health.IsDead || !enemy.gameObject.activeInHierarchy) continue;
+
+            if (!NearbyEnemies.Contains(enemy))
+            {
+                NearbyEnemies.Add(enemy);
+            }
+        }
+
+        if (BuildingAttacker.CurrentTargetTransform != null && NearbyEnemies.Contains(BuildingAttacker.CurrentTargetTransform)) return;
+
+        BuildingAttacker.StopAttacking();
+        TargetNext();
     }
 }

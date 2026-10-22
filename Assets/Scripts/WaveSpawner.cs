@@ -13,6 +13,9 @@ public class WaveSpawner : MonoBehaviour
     [SerializeField] private float SpawnInterval = 0.3f;        // time between each spawn
     [SerializeField] private float TimeBetweenWaves = 10f;      // after a wave is cleared, time before the next one
 
+    public event System.Action<int> OnWaveStarted;          // for the weather event system
+    public event System.Action<int> OnWaveEnded;
+
     public int CurrentWave {  get; private set; }
     public int ActiveEnemyCount { get; private set; }
 
@@ -32,10 +35,15 @@ public class WaveSpawner : MonoBehaviour
             ++CurrentWave;
             Debug.Log($"Wave {CurrentWave} is starting now!");
 
+            OnWaveStarted?.Invoke(CurrentWave);
+
             yield return SpawnWave(CurrentWave);
 
             yield return new WaitUntil(() => ActiveEnemyCount <= 0);
             Debug.Log($"Wave {CurrentWave} cleared");
+
+            OnWaveEnded?.Invoke(CurrentWave);
+
             StatCollector.Instance.WaveCompleted(CurrentWave);
 
             yield return new WaitForSeconds(TimeBetweenWaves);
