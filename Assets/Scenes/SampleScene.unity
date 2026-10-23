@@ -1131,6 +1131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeatherManager
   WeatherEventPrefabs:
+  - {fileID: 765354168903369214, guid: 37d0c58075442b7439139b2d77611c7a, type: 3}
   - {fileID: 1351979763650391041, guid: aff76254b6cebe841b4a6b1842d909eb, type: 3}
   FirstWeatherWave: 4
   EventChance: 0.4
@@ -10751,6 +10752,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -4843150086263191298, guid: eb392ddd65811724ebd7f4673f77ba6a, type: 3}
+      propertyPath: RangeUpgrade.Step
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -4843150086263191298, guid: eb392ddd65811724ebd7f4673f77ba6a, type: 3}
+      propertyPath: KnockbackUpgrade.Step
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: -4843150086263191298, guid: eb392ddd65811724ebd7f4673f77ba6a, type: 3}
+      propertyPath: RangeUpgrade.BaseCost
+      value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: -4843150086263191298, guid: eb392ddd65811724ebd7f4673f77ba6a, type: 3}
+      propertyPath: RangeUpgrade.MaxLevel
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 392717838074494938, guid: eb392ddd65811724ebd7f4673f77ba6a, type: 3}
       propertyPath: m_Enabled
       value: 1

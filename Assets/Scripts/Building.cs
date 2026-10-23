@@ -21,6 +21,7 @@ public class Building : MonoBehaviour
     public bool HasRange => RangeCollider != null;
 
     private float BaseRange;
+    private float InitialRange;
     private float WeatherRangeMultiplier = 1f;
     private Vector3 BaseRangeRingScale;
 
@@ -42,6 +43,7 @@ public class Building : MonoBehaviour
         if (RangeCollider != null)
         {
             BaseRange = RangeCollider.radius;
+            InitialRange = BaseRange;
         }
 
         if (RangeRing != null)
@@ -81,8 +83,9 @@ public class Building : MonoBehaviour
 
         if (RangeRing != null)
         {
-            float ratio = EffectiveRange / Mathf.Max(0.1f, BaseRange);
-            RangeRing.transform.localScale = BaseRangeRingScale * ratio;
+            float Ratio = EffectiveRange / Mathf.Max(0.1f, InitialRange);
+
+            RangeRing.transform.localScale = BaseRangeRingScale * Ratio;
         }
     }
 
