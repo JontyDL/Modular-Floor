@@ -62,7 +62,7 @@ public class CameraClicker : MonoBehaviour
 
         Vector2 screenPos = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
         Ray ray = targetCamera.ScreenPointToRay(screenPos);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, interactableLayers))
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, interactableLayers, QueryTriggerInteraction.Ignore))
         {
             IInteractable[] interactables = hit.collider.GetComponents<IInteractable>();
 
